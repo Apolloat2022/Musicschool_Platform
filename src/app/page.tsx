@@ -1,17 +1,37 @@
+import { db } from "@/lib/db";
+import { musicClasses } from "@/lib/db/schema";
 import Link from "next/link";
-import { Music } from "lucide-react";
 
-export default function Home() {
+export default async function HomePage() {
+  const classes = await db.select().from(musicClasses);
+
   return (
-    <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center text-white p-4">
-      <Music className="w-16 h-16 text-indigo-400 mb-6" />
-      <h1 className="text-5xl font-bold mb-4 text-center">Music Masterclass Platform</h1>
-      <p className="text-slate-400 mb-8 text-xl">High-fidelity group lessons for musicians.</p>
-      <div className="flex gap-4">
-        <Link href="/admin" className="bg-indigo-600 px-8 py-3 rounded-full font-bold hover:bg-indigo-700 transition">
-          Teacher Dashboard
-        </Link>
+    <main className="min-h-screen bg-slate-950 text-white p-8">
+      <div className="max-w-4xl mx-auto text-center mb-12">
+        <h1 className="text-5xl font-bold mb-4">Music Masterclass</h1>
+        <p className="text-slate-400 text-lg">Join a live high-fidelity session and master your craft.</p>
       </div>
-    </div>
+
+      <div className="grid gap-6 md:grid-cols-2 max-w-4xl mx-auto">
+        {classes.map((cls) => (
+          <div key={cls.id} className="bg-slate-900 border border-slate-800 p-6 rounded-2xl hover:border-indigo-500 transition">
+            <h2 className="text-2xl font-semibold mb-2">{cls.title}</h2>
+            <p className="text-indigo-400 mb-4">{cls.instrument} • {cls.dayOfWeek} at {cls.startTime}</p>
+            <Link 
+              href={`/enroll/${cls.id}`} 
+              className="block text-center bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 rounded-lg transition"
+            >
+              Enroll Now
+            </Link>
+          </div>
+        ))}
+      </div>
+
+      <footer className="mt-20 text-center">
+        <Link href="/admin" className="text-slate-500 hover:text-slate-300 text-sm underline">
+          Teacher Login
+        </Link>
+      </footer>
+    </main>
   );
 }
