@@ -4,6 +4,7 @@ import { Resend } from 'resend';
 import WelcomeEmail from '@/components/WelcomeEmail';
 import { db } from '@/lib/db';
 import { musicClasses, enrollments } from '@/lib/db/schema';
+import { eq } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
@@ -35,8 +36,12 @@ export async function enrollStudent(formData: FormData) {
 
   // 2. Send Welcome Email
   try {
-    // Fetch class details for the email (optional - you could store this in the form if needed)
-    const [classInfo] = await db.select().from(musicClasses).where({ id: classId }).limit(1);
+    // Fetch class details for the email
+    const [classInfo] = await db
+      .select()
+      .from(musicClasses)
+      .where(eq(musicClasses.id, classId)) // Correct Drizzle syntax
+      .limit(1);
     
     await resend.emails.send({
       from: 'Music School <onboarding@resend.dev>', // Update this with your domain
