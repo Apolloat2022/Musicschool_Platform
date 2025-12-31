@@ -33,7 +33,15 @@ export default function ClassroomView({ user, classData, role }: ClassroomViewPr
                         <Music size={20} />
                     </div>
                     <div>
-                        <h1 className="text-lg font-bold text-white leading-tight">{classData.title}</h1>
+                        <div className="flex items-center gap-2">
+                            <h1 className="text-lg font-bold text-white leading-tight">{classData.title}</h1>
+                            <span className={`text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-tighter ${role === "MODERATOR" ? "bg-amber-500/20 text-amber-400 border border-amber-500/30" :
+                                    role === "STUDENT" ? "bg-indigo-500/20 text-indigo-400 border border-indigo-500/30" :
+                                        "bg-slate-500/20 text-slate-400 border border-slate-500/30"
+                                }`}>
+                                {role}
+                            </span>
+                        </div>
                         <p className="text-xs text-slate-500 uppercase tracking-widest font-bold">{classData.instrument} Academy</p>
                     </div>
                 </div>

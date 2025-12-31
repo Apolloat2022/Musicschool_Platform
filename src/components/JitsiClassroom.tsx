@@ -18,7 +18,13 @@ export default function JitsiClassroom({ roomName, userName, userId, userEmail, 
     const appId = process.env.NEXT_PUBLIC_JITSI_APP_ID;
 
     useEffect(() => {
-        console.log(`[Jitsi] Initializing for room: ${roomName}, user: ${userName} (${userId})`);
+        if (!appId) {
+            console.error("[Jitsi] NEXT_PUBLIC_JITSI_APP_ID is missing from frontend environment.");
+            setError("Configuration Error: Classroom ID is missing. Please check your system settings.");
+            return;
+        }
+
+        console.log(`[Jitsi] Initializing for room: ${roomName}, user: ${userName} (${userId}), appId: ${appId}`);
 
         const timeout = setTimeout(() => {
             if (!token && !error) {
@@ -50,7 +56,7 @@ export default function JitsiClassroom({ roomName, userName, userId, userEmail, 
         fetchToken();
 
         return () => clearTimeout(timeout);
-    }, [roomName, userName, userId, userEmail]);
+    }, [roomName, userName, userId, userEmail, isModerator]);
 
     if (error) {
         return (

@@ -41,7 +41,7 @@ export async function signJitsiToken(options: JitsiTokenOptions) {
             aud: "jitsi",
             iss: "chat",
             sub: appId,
-            room: options.room,
+            room: "*", // Use wildcard for maximum compatibility
             context: {
                 user: {
                     id: options.userId,
@@ -50,10 +50,10 @@ export async function signJitsiToken(options: JitsiTokenOptions) {
                     affiliation: options.isModerator ? "owner" : "member",
                 },
                 features: {
-                    livestreaming: true,
-                    recording: true,
-                    transcription: true,
-                    "outbound-call": false,
+                    livestreaming: "true",
+                    recording: "true",
+                    transcription: "true",
+                    "outbound-call": "false",
                 },
             },
         };
