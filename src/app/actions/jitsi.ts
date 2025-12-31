@@ -5,15 +5,17 @@ import { signJitsiToken } from "@/lib/jitsi-auth";
 
 export async function getJitsiToken(room: string, userName: string, userEmail?: string) {
     try {
+        console.log(`[Jitsi Production] Starting token generation for room: ${room}`);
         const token = signJitsiToken({
             room,
             userName,
             userEmail,
-            isModerator: false, // Default to false, logic can be updated for faculty
+            isModerator: false,
         });
+        console.log(`[Jitsi Production] Token generation successful.`);
         return { token, error: null };
     } catch (error: any) {
-        console.error("Failed to generate Jitsi token:", error);
+        console.error("[Jitsi Production] Token generation failed:", error.message);
         return { token: null, error: error.message };
     }
 }

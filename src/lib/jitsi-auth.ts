@@ -8,13 +8,25 @@ export interface JitsiTokenOptions {
 }
 
 export function signJitsiToken(options: JitsiTokenOptions) {
-    const appId = process.env.JITSI_APPLE_API || process.env.JITSI_API;
-    let privateKey = process.env.JITSI_PRIVATE_KEY?.replace(/\\n/g, '\n').trim();
+    const appId = process.env.JITSI_APPLE_API || process.env.JITSI_API || process.env.NEXT_PUBLIC_JITSI_APP_ID;
+    const rawKey = process.env.JITSI_PRIVATE_KEY;
     const kid = process.env.JITSI_PUBLIC_KEY || appId;
 
-    if (!appId || !privateKey) {
-        throw new Error("Jitsi Configuration Error: Application ID and Private Key are required.");
+    console.log(`[Jitsi Auth Check] AppId: ${appId ? 'OK' : 'MISSING'}`);
+    console.log(`[Jitsi Auth Check] PrivateKey: ${rawKey ? 'OK' : 'MISSING'}`);
+    console.log(`[Jitsi Auth Check] KID: ${kid ? 'OK' : 'MISSING'}`);
+
+    if (!appId || !rawKey) {
+        const missing = [];
+        if (!appId) missing.push("App ID");
+        if (!rawKey) missing.push("Private Key");
+        const errorMsg = `Jitsi Configuration Error: Missing ${missing.join(" and ")}.`;
+        console.error(`[Jitsi Auth Error] ${errorMsg}`);
+        throw new Error(errorMsg);
     }
+
+    // Handle both literal \n and real newlines
+    const privateKey = rawKey.replace(/\\n/g, '\n').trim();
 
     const payload = {
         aud: "jitsi",
