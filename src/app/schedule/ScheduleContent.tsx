@@ -109,6 +109,10 @@ export default function ScheduleContent({ classes, user, globalRole, enrolledCla
         );
     }
 
+    const enrolledClasses = useMemo(() => {
+        return classes.filter(cls => enrolledClassIds.includes(cls.id));
+    }, [classes, enrolledClassIds]);
+
     return (
         <div className="max-w-6xl mx-auto px-6 py-12">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
@@ -133,6 +137,54 @@ export default function ScheduleContent({ classes, user, globalRole, enrolledCla
                     ))}
                 </div>
             </div>
+
+            {/* My Enrolled Classes Section */}
+            {enrolledClasses.length > 0 && (
+                <div className="mb-16">
+                    <div className="flex items-center gap-3 mb-6">
+                        <div className="h-px bg-indigo-500/30 flex-grow" />
+                        <h2 className="text-sm font-bold uppercase tracking-[0.3em] text-indigo-400 whitespace-nowrap">
+                            My Enrolled Classes
+                        </h2>
+                        <div className="h-px bg-indigo-500/30 flex-grow" />
+                    </div>
+                    <div className="grid grid-cols-1 gap-4">
+                        {enrolledClasses.map((cls, idx) => {
+                            const level = getLevelInfo(cls.title);
+                            const Icon = getInstrumentIcon(cls.instrument);
+                            const instructor = instructors[idx % instructors.length];
+
+                            return (
+                                <div
+                                    key={`enrolled-${cls.id}`}
+                                    className="group relative bg-indigo-500/5 border border-indigo-500/20 rounded-2xl p-6 flex flex-col md:flex-row items-center gap-6 hover:border-indigo-500/40 transition-all"
+                                >
+                                    <div className="flex items-center gap-4 flex-grow w-full md:w-auto">
+                                        <div className="p-3 bg-indigo-500/10 rounded-xl text-indigo-400">
+                                            <Icon size={24} />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-lg font-bold text-white">{cls.title}</h3>
+                                            <div className="flex items-center gap-4 text-xs text-slate-500 mt-1">
+                                                <span className="flex items-center gap-1"><User size={12} /> {instructor}</span>
+                                                <span className="flex items-center gap-1"><Calendar size={12} /> {cls.dayOfWeek}</span>
+                                                <span className="flex items-center gap-1"><Clock size={12} /> {cls.startTime}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button
+                                        onClick={() => setActiveClassroom({ ...cls, instructor })}
+                                        className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-8 py-3 rounded-xl transition-all shadow-lg shadow-indigo-600/20 flex items-center gap-2 whitespace-nowrap w-full md:w-auto justify-center"
+                                    >
+                                        <Video size={16} />
+                                        Join Class
+                                    </button>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+            )}
 
             <div className="grid grid-cols-1 gap-6">
                 {filteredClasses.length > 0 ? (
@@ -182,10 +234,10 @@ export default function ScheduleContent({ classes, user, globalRole, enrolledCla
                                     <button
                                         onClick={() => setActiveClassroom({ ...cls, instructor })}
                                         className={`flex items-center justify-center gap-2 font-bold px-8 py-3.5 rounded-xl transition-all duration-300 shadow-lg w-full group/btn ${classRole === "MODERATOR"
-                                                ? "bg-amber-600 hover:bg-amber-500 text-white shadow-amber-600/20"
-                                                : classRole === "STUDENT"
-                                                    ? "bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-600/20"
-                                                    : "bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30"
+                                            ? "bg-amber-600 hover:bg-amber-500 text-white shadow-amber-600/20"
+                                            : classRole === "STUDENT"
+                                                ? "bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-600/20"
+                                                : "bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30"
                                             }`}
                                     >
                                         <Video size={18} />

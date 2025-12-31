@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 import { currentUser } from "@clerk/nextjs/server";
 import { getAcademyRole } from "@/lib/auth-utils";
+import { SignInButton, UserButton, SignedIn, SignedOut } from "@clerk/nextjs";
 
 export const dynamic = "force-dynamic";
 
@@ -48,7 +49,24 @@ export default async function SchedulePage() {
                     <div className="font-bold text-xl tracking-tight">
                         Apollo <span className="text-indigo-500">Academy</span>
                     </div>
-                    <div className="w-24"></div> {/* Spacer */}
+                    <div className="flex items-center gap-4">
+                        <SignedOut>
+                            <SignInButton mode="modal">
+                                <button className="text-sm font-bold bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2 rounded-xl transition shadow-lg shadow-indigo-600/20">
+                                    Sign In
+                                </button>
+                            </SignInButton>
+                        </SignedOut>
+                        <SignedIn>
+                            <UserButton
+                                appearance={{
+                                    elements: {
+                                        userButtonAvatarBox: "w-10 h-10 border-2 border-indigo-500/20"
+                                    }
+                                }}
+                            />
+                        </SignedIn>
+                    </div>
                 </div>
             </nav>
 
