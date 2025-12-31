@@ -4,6 +4,7 @@ import { eq } from "drizzle-orm";
 import ClassroomView from "@/components/ClassroomView";
 import { notFound } from "next/navigation";
 import { currentUser } from "@clerk/nextjs/server";
+import { getAcademyRole } from "@/lib/auth-utils";
 
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -15,33 +16,8 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
 
   if (!musicClass) notFound();
 
-  // 1. Determine User Role
-  let role: "MODERATOR" | "STUDENT" | "GUEST" = "GUEST";
-
-  if (user) {
-    // Check if user is an admin/instructor
-    const userEmail = user.emailAddresses[0]?.emailAddress || "";
-    const isAdmin = user.publicMetadata?.role === "admin" ||
-      user.publicMetadata?.role === "instructor" ||
-      userEmail === "revanaglobal@gmail.com" ||
-      userEmail === "pandey201@yahoo.com";
-
-    if (isAdmin) {
-      role = "MODERATOR";
-    } else {
-      // Check if student is enrolled in this specific class
-      const enrollment = await db.query.enrollments.findFirst({
-        where: (enrollments, { and, eq }) => and(
-          eq(enrollments.classId, musicClass.id),
-          eq(enrollments.studentEmail, userEmail)
-        )
-      });
-
-      if (enrollment) {
-        role = "STUDENT";
-      }
-    }
-  }
+  // 1. Determine User Role using shared utility
+  const role = await getAcademyRole(user, musicClass.id);
 
   const mockUser = {
     id: user?.id || `guest-${Math.random().toString(36).substring(7)}`,

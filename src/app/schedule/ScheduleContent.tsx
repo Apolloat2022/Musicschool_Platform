@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import SmartClassroom from "@/components/SmartClassroom";
+import { UserRole } from "@/lib/auth-utils";
 
 const instruments = [
     { name: "All", icon: Music },
@@ -27,16 +28,22 @@ const instruments = [
 
 const instructors = ["Sarah Jenkins", "Michael Chen", "Elena Rodriguez", "David Strauss", "Aria Smith"];
 
-// Mock user for simulation
-const mockUser = {
-    id: "user_1",
-    name: "John Doe",
-    email: "john@example.com",
-};
+interface ScheduleContentProps {
+    classes: any[];
+    user: { id: string; name: string; email: string; } | null;
+    role: UserRole;
+}
 
-export default function ScheduleContent({ classes }: { classes: any[] }) {
+export default function ScheduleContent({ classes, user, role }: ScheduleContentProps) {
     const [selectedInstrument, setSelectedInstrument] = useState("All");
     const [activeClassroom, setActiveClassroom] = useState<any>(null);
+
+    // Fallback for guest if user prop is null
+    const currentUser = user || {
+        id: `guest-${Math.random().toString(36).substring(7)}`,
+        name: "Guest Student",
+        email: "",
+    };
 
     const filteredClasses = useMemo(() => {
         return classes.filter(cls =>
@@ -82,13 +89,13 @@ export default function ScheduleContent({ classes }: { classes: any[] }) {
                     </div>
                 </div>
                 <SmartClassroom
-                    user={mockUser}
+                    user={currentUser}
                     classData={{
                         roomName: activeClassroom.title.replace(/\s+/g, '-'),
-                        meetingNumber: "123456789",
+                        meetingNumber: activeClassroom.zoomMeetingNumber || "123456789",
                         password: "test"
                     }}
-                    role="STUDENT"
+                    role={role}
                 />
             </div>
         );

@@ -3,11 +3,21 @@ import { musicClasses } from "@/lib/db/schema";
 import ScheduleContent from "./ScheduleContent";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
+import { currentUser } from "@clerk/nextjs/server";
+import { getAcademyRole } from "@/lib/auth-utils";
 
 export const dynamic = "force-dynamic";
 
 export default async function SchedulePage() {
     const classes = await db.select().from(musicClasses);
+    const user = await currentUser();
+    const role = await getAcademyRole(user);
+
+    const userData = user ? {
+        id: user.id,
+        name: user.firstName ? `${user.firstName} ${user.lastName}` : (user.username || "Academy Student"),
+        email: user.emailAddresses[0]?.emailAddress || "",
+    } : null;
 
     return (
         <main className="min-h-screen bg-slate-950 text-white selection:bg-indigo-500/30">
@@ -28,7 +38,7 @@ export default async function SchedulePage() {
                 </div>
             </nav>
 
-            <ScheduleContent classes={classes} />
+            <ScheduleContent classes={classes} user={userData} role={role} />
 
             <footer className="py-12 text-center border-t border-slate-900 mt-12">
                 <p className="text-slate-500 text-sm">
