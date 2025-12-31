@@ -6,7 +6,7 @@ import { signJitsiToken } from "@/lib/jitsi-auth";
 export async function getJitsiToken(room: string, userName: string, userEmail?: string) {
     try {
         console.log(`[Jitsi Production] Starting token generation for room: ${room}`);
-        const token = signJitsiToken({
+        const token = await signJitsiToken({
             room,
             userName,
             userEmail,
