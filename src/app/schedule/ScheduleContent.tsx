@@ -129,7 +129,7 @@ export default function ScheduleContent({ classes, user, globalRole, enrolledCla
                 <SmartClassroom
                     user={currentUser}
                     classData={{
-                        roomName: activeClassroom.title.replace(/\s+/g, '-'),
+                        roomName: `apollo-class-${activeClassroom.id}`,
                         meetingNumber: activeClassroom.zoomMeetingNumber || "123456789",
                         password: "test"
                     }}

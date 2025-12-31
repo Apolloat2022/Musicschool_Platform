@@ -26,18 +26,15 @@ export default function SmartClassroom({
     classData: ClassData,
     role: UserRole
 }) {
-    const isAuthorized = role === "MODERATOR" || role === "STUDENT";
-
     const [sessionTime, setSessionTime] = useState(0);
 
     useEffect(() => {
-        if (role === "MODERATOR") {
-            const interval = setInterval(() => {
-                setSessionTime(prev => prev + 1);
-            }, 1000);
-            return () => clearInterval(interval);
-        }
-    }, [role]);
+        // Run timer for everyone, but we only show it to moderators
+        const interval = setInterval(() => {
+            setSessionTime(prev => prev + 1);
+        }, 1000);
+        return () => clearInterval(interval);
+    }, []);
 
     const formatTime = (seconds: number) => {
         const mins = Math.floor(seconds / 60);
@@ -45,57 +42,50 @@ export default function SmartClassroom({
         return `${mins}:${secs.toString().padStart(2, '0')}`;
     };
 
-    if (isAuthorized) {
-        return (
-            <div className="space-y-4">
-                <div className="sticky top-0 z-10 py-2 bg-slate-950/80 backdrop-blur-md rounded-xl border border-white/5 mb-4">
-                    <div className="flex items-center justify-between px-4">
-                        <div className="flex flex-col">
-                            <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                                <span className={`w-2 h-2 ${role === "MODERATOR" ? "bg-amber-400" : "bg-indigo-500"} rounded-full animate-pulse`} />
-                                {role === "MODERATOR" ? "Instructor Control Center" : "Premium Jitsi Classroom"}
-                            </h2>
+    // All authorized or trial users go to Jitsi now (Zoom SDK is unstable on React 19)
+    return (
+        <div className="space-y-4">
+            <div className={`sticky top-0 z-10 py-2 backdrop-blur-md rounded-xl border border-white/5 mb-4 ${role === "MODERATOR" ? "bg-amber-950/20" :
+                    role === "STUDENT" ? "bg-indigo-950/20" : "bg-blue-950/20"
+                }`}>
+                <div className="flex items-center justify-between px-4">
+                    <div className="flex flex-col">
+                        <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                            <span className={`w-2 h-2 ${role === "MODERATOR" ? "bg-amber-400" :
+                                    role === "STUDENT" ? "bg-indigo-500" : "bg-blue-500"
+                                } rounded-full animate-pulse`} />
+                            {role === "MODERATOR" ? "Instructor Control Center" :
+                                role === "STUDENT" ? "Premium Jitsi Classroom" : "Trial Jitsi Classroom"}
+                        </h2>
+                        <div className="flex items-center gap-3">
                             {role === "MODERATOR" && (
-                                <span className="text-[10px] text-amber-400 font-mono mt-0.5">
+                                <span className="text-[10px] text-amber-400 font-mono mt-0.5 uppercase tracking-tighter">
                                     SESSION DURATION: {formatTime(sessionTime)}
                                 </span>
                             )}
+                            {role === "GUEST" && (
+                                <span className="text-[10px] text-blue-400 font-bold mt-0.5 uppercase">
+                                    Trial Timer: {formatTime(sessionTime)} / 30:00
+                                </span>
+                            )}
                         </div>
-                        <span className={`text-[10px] font-bold uppercase tracking-widest ${role === "MODERATOR" ? "text-amber-400 bg-amber-500/10" : "text-indigo-400 bg-indigo-500/10"} px-2 py-1 rounded border ${role === "MODERATOR" ? "border-amber-500/20" : "border-indigo-500/20"}`}>
-                            {role === "MODERATOR" ? "Moderator Mode" : "Unlimited Session"}
-                        </span>
                     </div>
-                </div>
-                <JitsiClassroom
-                    roomName={classData.roomName}
-                    userName={user.name}
-                    userId={user.id}
-                    userEmail={user.email}
-                    isModerator={role === "MODERATOR"}
-                />
-            </div>
-        );
-    }
-
-    return (
-        <div className="space-y-4">
-            <div className="flex items-center justify-between px-4">
-                <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                    <span className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
-                    Trial Zoom Classroom
-                </h2>
-                <div className="flex flex-col items-end gap-1">
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-blue-400 bg-blue-500/10 px-2 py-1 rounded">
-                        Enrollment Required for Jitsi
+                    <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded border ${role === "MODERATOR" ? "text-amber-400 bg-amber-500/10 border-amber-500/20" :
+                            role === "STUDENT" ? "text-indigo-400 bg-indigo-500/10 border-indigo-500/20" :
+                                "text-blue-400 bg-blue-500/10 border-blue-500/20"
+                        }`}>
+                        {role === "MODERATOR" ? "Moderator Mode" :
+                            role === "STUDENT" ? "Unlimited Session" : "30m Limit Applied"}
                     </span>
-                    <span className="text-[9px] text-slate-500 italic">30m Session Limit</span>
                 </div>
             </div>
-            <ZoomClassroom
-                meetingNumber={classData.meetingNumber || "123456789"}
+
+            <JitsiClassroom
+                roomName={classData.roomName}
                 userName={user.name}
-                password={classData.password}
-                role={0} // Student for this view
+                userId={user.id}
+                userEmail={user.email}
+                isModerator={role === "MODERATOR"}
             />
         </div>
     );

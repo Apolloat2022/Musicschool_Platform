@@ -128,6 +128,15 @@ export default function JitsiClassroom({ roomName, userName, userId, userEmail, 
                 getIFrameRef={(iframeRef) => {
                     iframeRef.style.height = "100%";
                     iframeRef.style.width = "100%";
+
+                    // Trial Limit Enforcement
+                    if (!isModerator) {
+                        const trialLimit = 30 * 60 * 1000;
+                        setTimeout(() => {
+                            alert("Your 30-minute trial session has concluded. Please enroll to continue your journey with Apollo Music Academy!");
+                            window.location.href = "/schedule";
+                        }, trialLimit);
+                    }
                 }}
             />
         </div>
