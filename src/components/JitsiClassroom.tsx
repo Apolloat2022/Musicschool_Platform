@@ -16,33 +16,39 @@ export default function JitsiClassroom({ roomName, userName, userEmail }: JitsiC
     const appId = process.env.NEXT_PUBLIC_JITSI_APP_ID;
 
     useEffect(() => {
-        const fullRoomName = `${appId}/${roomName}`;
+        console.log(`[Jitsi] Initializing for room: ${roomName}, user: ${userName}`);
 
         const timeout = setTimeout(() => {
             if (!token && !error) {
+                console.warn("[Jitsi] 45s timeout reached without response.");
                 setError("The secure classroom took too long to initialize. This could be a temporary server delay. Please try refreshing the page.");
             }
-        }, 45000); // Increased to 45s for extremely slow starts
+        }, 45000);
 
         async function fetchToken() {
             try {
-                // IMPORTANT: Room name in token MUST precisely match the room name in Jitsi SDK
-                const result = await getJitsiToken(fullRoomName, userName, userEmail);
+                console.log("[Jitsi] Requesting token from server...");
+                // Pass simple room name, let server prefix it with App ID
+                const result = await getJitsiToken(roomName, userName, userEmail);
+
                 if (result.error) {
+                    console.error("[Jitsi] Server returned error:", result.error);
                     setError(`Server Error: ${result.error}`);
                 } else if (result.token) {
+                    console.log("[Jitsi] Token received successfully.");
                     setToken(result.token);
                 } else {
                     setError("Communication failure: No security token received.");
                 }
             } catch (err: any) {
+                console.error("[Jitsi] Network or Fetch error:", err);
                 setError(`Network Error: ${err.message || "Failed to contact classroom server."}`);
             }
         }
         fetchToken();
 
         return () => clearTimeout(timeout);
-    }, [roomName, userName, userEmail, appId]);
+    }, [roomName, userName, userEmail]);
 
     if (error) {
         return (

@@ -8,18 +8,26 @@ export async function getJitsiToken(room: string, userName: string, userEmail?: 
         return { token: "health-ok", error: null };
     }
 
+    const appId = process.env.JITSI_APPLE_API || process.env.JITSI_API || process.env.NEXT_PUBLIC_JITSI_APP_ID;
+
     try {
-        console.log(`[Jitsi Action] START: room=${room}`);
+        console.log(`[Jitsi Action] Starting for room: ${room}`);
+
+        if (!appId) {
+            throw new Error("Missing Jitsi App ID on server.");
+        }
+
+        const fullRoomName = room.startsWith(appId) ? room : `${appId}/${room}`;
+        console.log(`[Jitsi Action] Target Room: ${fullRoomName}`);
 
         // Vercel execution limit is often 10s on hobby plan. 
-        // We set 8s to ensure we return a response before Vercel kills us.
         const timeoutPromise = new Promise((_, reject) =>
-            setTimeout(() => reject(new Error("Server timeout after 8 seconds. Please refresh.")), 8000)
+            setTimeout(() => reject(new Error("Server timeout (8s). The crypto operation took too long.")), 8000)
         );
 
         const token = await Promise.race([
             signJitsiToken({
-                room,
+                room: fullRoomName,
                 userName,
                 userEmail,
                 isModerator: false,
@@ -27,11 +35,10 @@ export async function getJitsiToken(room: string, userName: string, userEmail?: 
             timeoutPromise
         ]) as string;
 
-        console.log(`[Jitsi Action] SUCCESS`);
+        console.log(`[Jitsi Action] SUCCESS: Token generated for ${fullRoomName}`);
         return { token, error: null };
     } catch (error: any) {
-        console.error(`[Jitsi Action] FAIL: ${error.message}`);
-        // Return a clean error message to the frontend
-        return { token: null, error: error.message || "Secret key signing failure" };
+        console.error(`[Jitsi Action] ERROR: ${error.message}`);
+        return { token: null, error: error.message || "Unknown signing error" };
     }
 }
