@@ -16,36 +16,45 @@ export default function JitsiClassroom({ roomName, userName, userEmail }: JitsiC
     const appId = process.env.NEXT_PUBLIC_JITSI_APP_ID;
 
     useEffect(() => {
+        const fullRoomName = `${appId}/${roomName}`;
+
         const timeout = setTimeout(() => {
             if (!token && !error) {
-                setError("Initialization timed out. This usually happens if the server action hangs or API keys are improperly configured. We've increased the wait time to allow for cold starts.");
+                setError("The secure classroom took too long to initialize. This could be a temporary server delay. Please try refreshing the page.");
             }
-        }, 30000); // 30 second timeout
+        }, 45000); // Increased to 45s for extremely slow starts
 
         async function fetchToken() {
             try {
-                const result = await getJitsiToken(roomName, userName, userEmail);
+                // IMPORTANT: Room name in token MUST precisely match the room name in Jitsi SDK
+                const result = await getJitsiToken(fullRoomName, userName, userEmail);
                 if (result.error) {
-                    setError(result.error);
+                    setError(`Server Error: ${result.error}`);
                 } else if (result.token) {
                     setToken(result.token);
                 } else {
-                    setError("No token received from server.");
+                    setError("Communication failure: No security token received.");
                 }
             } catch (err: any) {
-                setError(err.message || "An unexpected error occurred.");
+                setError(`Network Error: ${err.message || "Failed to contact classroom server."}`);
             }
         }
         fetchToken();
 
         return () => clearTimeout(timeout);
-    }, [roomName, userName, userEmail]);
+    }, [roomName, userName, userEmail, appId]);
 
     if (error) {
         return (
             <div className="w-full h-[600px] bg-red-950/20 border-2 border-red-500/50 rounded-2xl p-10 flex flex-col items-center justify-center text-center">
                 <h3 className="text-xl font-bold text-red-400 mb-2">Classroom Secure Lock-out</h3>
                 <p className="text-red-300/70 max-w-md">{error}</p>
+                <button
+                    onClick={() => window.location.reload()}
+                    className="mt-6 px-6 py-2 bg-red-500 hover:bg-red-600 text-white rounded-full font-bold transition-colors"
+                >
+                    Retry Connection
+                </button>
             </div>
         );
     }

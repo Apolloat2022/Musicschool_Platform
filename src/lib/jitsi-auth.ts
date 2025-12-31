@@ -36,11 +36,12 @@ export async function signJitsiToken(options: JitsiTokenOptions) {
     try {
         const privateKey = await jose.importPKCS8(privateKeyPEM, "RS256");
 
+        // Use the room exactly as passed (which is now AppID/RoomName)
         const token = await new jose.SignJWT({
             aud: "jitsi",
             iss: "chat",
             sub: appId,
-            room: options.room === "*" ? "*" : options.room,
+            room: options.room,
             context: {
                 user: {
                     name: options.userName,
