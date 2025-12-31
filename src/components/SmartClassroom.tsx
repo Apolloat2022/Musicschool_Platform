@@ -1,5 +1,5 @@
 "use client";
-
+import { useState, useEffect } from "react";
 import JitsiClassroom from "./JitsiClassroom";
 import ZoomClassroom from "./ZoomClassroom";
 
@@ -28,17 +28,43 @@ export default function SmartClassroom({
 }) {
     const isAuthorized = role === "MODERATOR" || role === "STUDENT";
 
+    const [sessionTime, setSessionTime] = useState(0);
+
+    useEffect(() => {
+        if (role === "MODERATOR") {
+            const interval = setInterval(() => {
+                setSessionTime(prev => prev + 1);
+            }, 1000);
+            return () => clearInterval(interval);
+        }
+    }, [role]);
+
+    const formatTime = (seconds: number) => {
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${mins}:${secs.toString().padStart(2, '0')}`;
+    };
+
     if (isAuthorized) {
         return (
             <div className="space-y-4">
-                <div className="flex items-center justify-between px-4">
-                    <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                        <span className={`w-2 h-2 ${role === "MODERATOR" ? "bg-amber-400" : "bg-indigo-500"} rounded-full animate-pulse`} />
-                        {role === "MODERATOR" ? "Instructor Control Center" : "Premium Jitsi Classroom"}
-                    </h2>
-                    <span className={`text-[10px] font-bold uppercase tracking-widest ${role === "MODERATOR" ? "text-amber-400 bg-amber-500/10" : "text-indigo-400 bg-indigo-500/10"} px-2 py-1 rounded border ${role === "MODERATOR" ? "border-amber-500/20" : "border-indigo-500/20"}`}>
-                        {role === "MODERATOR" ? "Moderator Mode" : "Unlimited Session"}
-                    </span>
+                <div className="sticky top-0 z-10 py-2 bg-slate-950/80 backdrop-blur-md rounded-xl border border-white/5 mb-4">
+                    <div className="flex items-center justify-between px-4">
+                        <div className="flex flex-col">
+                            <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                                <span className={`w-2 h-2 ${role === "MODERATOR" ? "bg-amber-400" : "bg-indigo-500"} rounded-full animate-pulse`} />
+                                {role === "MODERATOR" ? "Instructor Control Center" : "Premium Jitsi Classroom"}
+                            </h2>
+                            {role === "MODERATOR" && (
+                                <span className="text-[10px] text-amber-400 font-mono mt-0.5">
+                                    SESSION DURATION: {formatTime(sessionTime)}
+                                </span>
+                            )}
+                        </div>
+                        <span className={`text-[10px] font-bold uppercase tracking-widest ${role === "MODERATOR" ? "text-amber-400 bg-amber-500/10" : "text-indigo-400 bg-indigo-500/10"} px-2 py-1 rounded border ${role === "MODERATOR" ? "border-amber-500/20" : "border-indigo-500/20"}`}>
+                            {role === "MODERATOR" ? "Moderator Mode" : "Unlimited Session"}
+                        </span>
+                    </div>
                 </div>
                 <JitsiClassroom
                     roomName={classData.roomName}

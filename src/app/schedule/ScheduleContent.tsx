@@ -48,7 +48,7 @@ export default function ScheduleContent({ classes, user, globalRole, enrolledCla
 
     // Fallback for guest if user prop is null
     const currentUser = user || {
-        id: `guest-${Math.random().toString(36).substring(7)}`,
+        id: "guest-user",
         name: "Guest Student",
         email: "",
     };
@@ -59,8 +59,8 @@ export default function ScheduleContent({ classes, user, globalRole, enrolledCla
         );
     }, [selectedInstrument, classes]);
 
-    const getLevelInfo = (title: string) => {
-        const t = title.toLowerCase();
+    const getLevelInfo = (title: string | null) => {
+        const t = (title || "").toLowerCase();
         if (t.includes("intro") || t.includes("beginner")) {
             return { label: "Intro", color: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20" };
         }
@@ -79,6 +79,36 @@ export default function ScheduleContent({ classes, user, globalRole, enrolledCla
             default: return Music;
         }
     };
+
+    const isLive = (dayOfWeek: string | null, startTime: string | null) => {
+        if (!dayOfWeek || !startTime) return false;
+
+        const now = new Date();
+        const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        const currentDay = days[now.getDay()];
+
+        if (dayOfWeek.toLowerCase() !== currentDay.toLowerCase()) return false;
+
+        // Parse "10:00 AM" or similar
+        const [time, modifier] = startTime.split(' ');
+        let [hours, minutes] = time.split(':').map(Number);
+
+        if (modifier === 'PM' && hours < 12) hours += 12;
+        if (modifier === 'AM' && hours === 12) hours = 0;
+
+        const classStart = new Date(now);
+        classStart.setHours(hours, minutes, 0, 0);
+
+        const classEnd = new Date(classStart);
+        classEnd.setHours(classEnd.getHours() + 1); // Assume 1 hour duration
+
+        return now >= classStart && now <= classEnd;
+    };
+
+    const enrolledClasses = useMemo(() => {
+        if (!classes || !enrolledClassIds) return [];
+        return classes.filter(cls => cls && enrolledClassIds.includes(cls.id));
+    }, [classes, enrolledClassIds]);
 
     if (activeClassroom) {
         return (
@@ -108,10 +138,6 @@ export default function ScheduleContent({ classes, user, globalRole, enrolledCla
             </div>
         );
     }
-
-    const enrolledClasses = useMemo(() => {
-        return classes.filter(cls => enrolledClassIds.includes(cls.id));
-    }, [classes, enrolledClassIds]);
 
     return (
         <div className="max-w-6xl mx-auto px-6 py-12">
@@ -213,6 +239,12 @@ export default function ScheduleContent({ classes, user, globalRole, enrolledCla
                                                 <Calendar size={12} />
                                                 {cls.dayOfWeek}
                                             </span>
+                                            {isLive(cls.dayOfWeek, cls.startTime) && (
+                                                <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-500/10 text-red-500 text-[10px] font-bold border border-red-500/20 animate-pulse">
+                                                    <span className="w-1.5 h-1.5 bg-red-500 rounded-full" />
+                                                    LIVE NOW
+                                                </span>
+                                            )}
                                         </div>
                                         <h2 className="text-2xl font-bold text-white group-hover:text-indigo-400 transition">
                                             {cls.title}
@@ -237,7 +269,7 @@ export default function ScheduleContent({ classes, user, globalRole, enrolledCla
                                             ? "bg-amber-600 hover:bg-amber-500 text-white shadow-amber-600/20"
                                             : classRole === "STUDENT"
                                                 ? "bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-600/20"
-                                                : "bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30"
+                                                : "bg-blue-600 hover:bg-blue-500 text-white shadow-blue-600/20 border border-blue-400/50"
                                             }`}
                                     >
                                         <Video size={18} />
