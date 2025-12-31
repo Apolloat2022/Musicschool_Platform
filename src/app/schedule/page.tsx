@@ -13,6 +13,20 @@ export default async function SchedulePage() {
     const user = await currentUser();
     const role = await getAcademyRole(user);
 
+    // Fetch enrollments for the current user to identify "Paid Students"
+    let enrolledClassIds: number[] = [];
+    if (user) {
+        const userEmail = user.emailAddresses[0]?.emailAddress;
+        if (userEmail) {
+            const userEnrollments = await db.query.enrollments.findMany({
+                where: (enrollments, { eq }) => eq(enrollments.studentEmail, userEmail)
+            });
+            enrolledClassIds = userEnrollments
+                .map(e => e.classId)
+                .filter((id): id is number => id !== null);
+        }
+    }
+
     const userData = user ? {
         id: user.id,
         name: user.firstName ? `${user.firstName} ${user.lastName}` : (user.username || "Academy Student"),
@@ -38,7 +52,12 @@ export default async function SchedulePage() {
                 </div>
             </nav>
 
-            <ScheduleContent classes={classes} user={userData} role={role} />
+            <ScheduleContent
+                classes={classes}
+                user={userData}
+                globalRole={role}
+                enrolledClassIds={enrolledClassIds}
+            />
 
             <footer className="py-12 text-center border-t border-slate-900 mt-12">
                 <p className="text-slate-500 text-sm">

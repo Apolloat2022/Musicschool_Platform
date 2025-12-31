@@ -31,12 +31,20 @@ const instructors = ["Sarah Jenkins", "Michael Chen", "Elena Rodriguez", "David 
 interface ScheduleContentProps {
     classes: any[];
     user: { id: string; name: string; email: string; } | null;
-    role: UserRole;
+    globalRole: UserRole;
+    enrolledClassIds: number[];
 }
 
-export default function ScheduleContent({ classes, user, role }: ScheduleContentProps) {
+export default function ScheduleContent({ classes, user, globalRole, enrolledClassIds }: ScheduleContentProps) {
     const [selectedInstrument, setSelectedInstrument] = useState("All");
     const [activeClassroom, setActiveClassroom] = useState<any>(null);
+
+    // Calculate role for the currently active classroom
+    const getActiveRole = (clsId: number): UserRole => {
+        if (globalRole === "MODERATOR") return "MODERATOR";
+        if (enrolledClassIds.includes(clsId)) return "STUDENT";
+        return "GUEST";
+    };
 
     // Fallback for guest if user prop is null
     const currentUser = user || {
@@ -95,7 +103,7 @@ export default function ScheduleContent({ classes, user, role }: ScheduleContent
                         meetingNumber: activeClassroom.zoomMeetingNumber || "123456789",
                         password: "test"
                     }}
-                    role={role}
+                    role={getActiveRole(activeClassroom.id)}
                 />
             </div>
         );
@@ -132,6 +140,8 @@ export default function ScheduleContent({ classes, user, role }: ScheduleContent
                         const level = getLevelInfo(cls.title);
                         const Icon = getInstrumentIcon(cls.instrument);
                         const instructor = instructors[idx % instructors.length];
+                        const classRole = getActiveRole(cls.id);
+                        const isEnrolled = enrolledClassIds.includes(cls.id);
 
                         return (
                             <div
@@ -171,17 +181,25 @@ export default function ScheduleContent({ classes, user, role }: ScheduleContent
                                 <div className="w-full md:w-auto shrink-0 flex flex-col gap-3 min-w-[200px]">
                                     <button
                                         onClick={() => setActiveClassroom({ ...cls, instructor })}
-                                        className="flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-8 py-3.5 rounded-xl transition-all duration-300 shadow-lg shadow-indigo-600/20 w-full group/btn"
+                                        className={`flex items-center justify-center gap-2 font-bold px-8 py-3.5 rounded-xl transition-all duration-300 shadow-lg w-full group/btn ${classRole === "MODERATOR"
+                                                ? "bg-amber-600 hover:bg-amber-500 text-white shadow-amber-600/20"
+                                                : classRole === "STUDENT"
+                                                    ? "bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-600/20"
+                                                    : "bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30"
+                                            }`}
                                     >
                                         <Video size={18} />
-                                        Launch Classroom
+                                        {classRole === "MODERATOR" ? "Start Class" : classRole === "STUDENT" ? "Join Class" : "Try Trial Session"}
                                     </button>
-                                    <Link
-                                        href={`/enroll/${cls.id}`}
-                                        className="flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold px-8 py-3 rounded-xl transition-all duration-300 w-full"
-                                    >
-                                        Secure Your Spot
-                                    </Link>
+
+                                    {!isEnrolled && classRole !== "MODERATOR" && (
+                                        <Link
+                                            href={`/enroll/${cls.id}`}
+                                            className="flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold px-8 py-3 rounded-xl transition-all duration-300 w-full"
+                                        >
+                                            Secure Your Spot
+                                        </Link>
+                                    )}
                                 </div>
                             </div>
                         );

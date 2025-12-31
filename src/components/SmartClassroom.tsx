@@ -34,9 +34,9 @@ export default function SmartClassroom({
                 <div className="flex items-center justify-between px-4">
                     <h2 className="text-xl font-bold text-white flex items-center gap-2">
                         <span className={`w-2 h-2 ${role === "MODERATOR" ? "bg-amber-400" : "bg-indigo-500"} rounded-full animate-pulse`} />
-                        {role === "MODERATOR" ? "Instructor Classroom" : "Premium Jitsi Classroom"}
+                        {role === "MODERATOR" ? "Instructor Control Center" : "Premium Jitsi Classroom"}
                     </h2>
-                    <span className={`text-[10px] font-bold uppercase tracking-widest ${role === "MODERATOR" ? "text-amber-400 bg-amber-500/10" : "text-indigo-400 bg-indigo-500/10"} px-2 py-1 rounded`}>
+                    <span className={`text-[10px] font-bold uppercase tracking-widest ${role === "MODERATOR" ? "text-amber-400 bg-amber-500/10" : "text-indigo-400 bg-indigo-500/10"} px-2 py-1 rounded border ${role === "MODERATOR" ? "border-amber-500/20" : "border-indigo-500/20"}`}>
                         {role === "MODERATOR" ? "Moderator Mode" : "Unlimited Session"}
                     </span>
                 </div>
