@@ -9,26 +9,29 @@ export async function getJitsiToken(room: string, userName: string, userEmail?: 
     }
 
     try {
-        console.log(`[Jitsi Action] START: room=${room}, user=${userName}`);
+        console.log(`[Jitsi Action] START: room=${room}`);
 
-        const signingPromise = signJitsiToken({
-            room,
-            userName,
-            userEmail,
-            isModerator: false,
-        });
-
+        // Vercel execution limit is often 10s on hobby plan. 
+        // We set 8s to ensure we return a response before Vercel kills us.
         const timeoutPromise = new Promise((_, reject) =>
-            setTimeout(() => reject(new Error("Vercel Server Timeout (12s)")), 12000)
+            setTimeout(() => reject(new Error("Server timeout after 8 seconds. Please refresh.")), 8000)
         );
 
-        console.log(`[Jitsi Action] Racing signing vs timeout...`);
-        const token = await Promise.race([signingPromise, timeoutPromise]) as string;
+        const token = await Promise.race([
+            signJitsiToken({
+                room,
+                userName,
+                userEmail,
+                isModerator: false,
+            }),
+            timeoutPromise
+        ]) as string;
 
-        console.log(`[Jitsi Action] SUCCESS: Token generated.`);
+        console.log(`[Jitsi Action] SUCCESS`);
         return { token, error: null };
     } catch (error: any) {
-        console.error(`[Jitsi Action] FATAL ERROR: ${error.message}`);
-        return { token: null, error: error.message };
+        console.error(`[Jitsi Action] FAIL: ${error.message}`);
+        // Return a clean error message to the frontend
+        return { token: null, error: error.message || "Secret key signing failure" };
     }
 }

@@ -26,10 +26,12 @@ export async function signJitsiToken(options: JitsiTokenOptions) {
         .replace(/["']/g, '') // Remove any accidental quotes from Vercel UI
         .replace(/\s/g, '');
 
-    console.log(`[Jitsi Auth] STEP 2: Key cleaned. Length: ${cleanKey.length}`);
-
-    // Simplified PEM reconstruction
-    const privateKeyPEM = `-----BEGIN PRIVATE KEY-----\n${cleanKey.replace(/(.{64})/g, "$1\n")}\n-----END PRIVATE KEY-----`;
+    // Reliable PEM reconstruction
+    const chunks = [];
+    for (let i = 0; i < cleanKey.length; i += 64) {
+        chunks.push(cleanKey.slice(i, i + 64));
+    }
+    const privateKeyPEM = `-----BEGIN PRIVATE KEY-----\n${chunks.join('\n')}\n-----END PRIVATE KEY-----`;
 
     try {
         const privateKey = await jose.importPKCS8(privateKeyPEM, "RS256");
