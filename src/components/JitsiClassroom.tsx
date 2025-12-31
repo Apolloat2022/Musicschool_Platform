@@ -18,9 +18,9 @@ export default function JitsiClassroom({ roomName, userName, userEmail }: JitsiC
     useEffect(() => {
         const timeout = setTimeout(() => {
             if (!token && !error) {
-                setError("Initialization timed out. This usually happens if the server action hangs or API keys are improperly configured.");
+                setError("Initialization timed out. This usually happens if the server action hangs or API keys are improperly configured. We've increased the wait time to allow for cold starts.");
             }
-        }, 15000); // 15 second timeout
+        }, 30000); // 30 second timeout
 
         async function fetchToken() {
             try {

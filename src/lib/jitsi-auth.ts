@@ -27,7 +27,11 @@ export async function signJitsiToken(options: JitsiTokenOptions) {
     console.log(`[Jitsi Auth] Key processing started. Cleaned length: ${cleanKey.length}`);
 
     // Reconstruct valid PEM
-    const privateKeyPEM = `-----BEGIN PRIVATE KEY-----\n${cleanKey.match(/.{1,64}/g)?.join('\n')}\n-----END PRIVATE KEY-----`;
+    const matches = cleanKey.match(/.{1,64}/g);
+    if (!matches) {
+        throw new Error("Jitsi Configuration Error: Private Key data is corrupt or empty.");
+    }
+    const privateKeyPEM = `-----BEGIN PRIVATE KEY-----\n${matches.join('\n')}\n-----END PRIVATE KEY-----`;
 
     try {
         console.log(`[Jitsi Auth] Importing private key...`);
