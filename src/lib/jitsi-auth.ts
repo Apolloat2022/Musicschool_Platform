@@ -39,7 +39,7 @@ export async function signJitsiToken(options: JitsiTokenOptions) {
 
         const payload = {
             aud: "jitsi",
-            iss: "8x8.vc", // Updated from 'chat' per user feedback
+            iss: "chat", // Reverted to 'chat' as suggested by Jitsi error message
             sub: appId,
             room: "*", // Keep wildcard for broad permission
             context: {
