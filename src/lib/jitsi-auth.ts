@@ -39,9 +39,9 @@ export async function signJitsiToken(options: JitsiTokenOptions) {
 
         const payload = {
             aud: "jitsi",
-            iss: "chat",
+            iss: "8x8.vc", // Updated from 'chat' per user feedback
             sub: appId,
-            room: "*", // Use wildcard for maximum compatibility
+            room: "*", // Keep wildcard for broad permission
             context: {
                 user: {
                     id: options.userId,
@@ -63,6 +63,7 @@ export async function signJitsiToken(options: JitsiTokenOptions) {
         const token = await new jose.SignJWT(payload)
             .setProtectedHeader({ alg: "RS256", kid: kid })
             .setIssuedAt()
+            .setNotBefore(Math.floor(Date.now() / 1000) - 60) // 1 minute in the past to prevent clock drift
             .setExpirationTime("1h")
             .sign(privateKey);
 
