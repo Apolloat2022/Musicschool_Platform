@@ -19,7 +19,14 @@ export default function FacultyDashboardPage() {
                     <div className="font-bold text-xl tracking-tight">
                         Apollo <span className="text-indigo-500">Academy</span> Faculty
                     </div>
-                    <div className="w-24"></div>
+                    <div className="flex items-center gap-4">
+                        <Link
+                            href="/admin"
+                            className="text-xs font-bold uppercase tracking-widest text-slate-400 hover:text-amber-400 transition"
+                        >
+                            Schedule Manager
+                        </Link>
+                    </div>
                 </div>
             </nav>
 

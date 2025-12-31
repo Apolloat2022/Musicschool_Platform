@@ -43,6 +43,7 @@ export default function HomePage() {
           </div>
           <div className="flex items-center gap-6">
             <Link href="/schedule" className="text-sm font-medium text-slate-400 hover:text-white transition">Schedule</Link>
+            <Link href="/admin" className="text-sm font-medium text-slate-400 hover:text-white transition">Admin</Link>
             <div className="h-4 w-px bg-slate-800 mx-2" />
             <SignedOut>
               <SignInButton mode="modal">
@@ -148,12 +149,20 @@ export default function HomePage() {
         <p className="text-slate-500 text-sm mb-4">
           © 2025 Apollo Music Academy • <span className="text-slate-400">Excellence in Performance</span>
         </p>
-        <Link
-          href="/faculty/dashboard"
-          className="text-slate-600 hover:text-indigo-400 text-[10px] uppercase tracking-[0.2em] font-bold transition-all"
-        >
-          Faculty Portal
-        </Link>
+        <div className="flex justify-center gap-8">
+          <Link
+            href="/faculty/dashboard"
+            className="text-slate-600 hover:text-indigo-400 text-[10px] uppercase tracking-[0.2em] font-bold transition-all"
+          >
+            Faculty Portal
+          </Link>
+          <Link
+            href="/admin"
+            className="text-slate-600 hover:text-amber-400 text-[10px] uppercase tracking-[0.2em] font-bold transition-all"
+          >
+            Admin Panel
+          </Link>
+        </div>
       </footer>
     </main>
   );
