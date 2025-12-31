@@ -37,12 +37,11 @@ export async function signJitsiToken(options: JitsiTokenOptions) {
     try {
         const privateKey = await jose.importPKCS8(privateKeyPEM, "RS256");
 
-        // Use the room exactly as passed (which is now AppID/RoomName)
-        const token = await new jose.SignJWT({
+        const payload = {
             aud: "jitsi",
             iss: "chat",
             sub: appId,
-            room: "*",
+            room: options.room,
             context: {
                 user: {
                     id: options.userId,
@@ -51,13 +50,17 @@ export async function signJitsiToken(options: JitsiTokenOptions) {
                     affiliation: options.isModerator ? "owner" : "member",
                 },
                 features: {
-                    livestreaming: "true",
-                    recording: "true",
-                    transcription: "true",
-                    "outbound-call": "false",
+                    livestreaming: true,
+                    recording: true,
+                    transcription: true,
+                    "outbound-call": false,
                 },
             },
-        })
+        };
+
+        console.log(`[Jitsi Auth] Signing Payload:`, JSON.stringify(payload, null, 2));
+
+        const token = await new jose.SignJWT(payload)
             .setProtectedHeader({ alg: "RS256", kid: kid })
             .setIssuedAt()
             .setExpirationTime("1h")

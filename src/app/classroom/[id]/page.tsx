@@ -20,7 +20,11 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
 
   if (user) {
     // Check if user is an admin/instructor
-    const isAdmin = user.publicMetadata?.role === "admin" || user.publicMetadata?.role === "instructor";
+    const userEmail = user.emailAddresses[0]?.emailAddress || "";
+    const isAdmin = user.publicMetadata?.role === "admin" ||
+      user.publicMetadata?.role === "instructor" ||
+      userEmail === "revanaglobal@gmail.com" ||
+      userEmail === "pandey201@yahoo.com";
 
     if (isAdmin) {
       role = "MODERATOR";
@@ -29,7 +33,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
       const enrollment = await db.query.enrollments.findFirst({
         where: (enrollments, { and, eq }) => and(
           eq(enrollments.classId, musicClass.id),
-          eq(enrollments.studentEmail, user.emailAddresses[0]?.emailAddress || "")
+          eq(enrollments.studentEmail, userEmail)
         )
       });
 
@@ -41,7 +45,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
 
   const mockUser = {
     id: user?.id || `guest-${Math.random().toString(36).substring(7)}`,
-    name: user?.firstName ? `${user.firstName} ${user.lastName}` : "Guest Student",
+    name: user?.firstName ? `${user.firstName} ${user.lastName}` : (user?.username || "Guest Student"),
     email: user?.emailAddresses[0]?.emailAddress || "",
   };
 
