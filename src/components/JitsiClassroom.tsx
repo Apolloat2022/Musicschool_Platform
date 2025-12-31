@@ -28,29 +28,32 @@ export default function JitsiClassroom({ roomName, userName, userId, userEmail, 
 
         const timeout = setTimeout(() => {
             if (!token && !error) {
-                console.warn("[Jitsi] 45s timeout reached without response.");
-                setError("The secure classroom took too long to initialize. This could be a temporary server delay. Please try refreshing the page.");
+                console.warn("[Jitsi] 45s connection timeout.");
+                setError("The secure classroom authorization is taking longer than expected. Please ensure you have a stable internet connection and try refreshing the page.");
             }
         }, 45000);
 
         async function fetchToken() {
             try {
-                console.log("[Jitsi] Requesting token from server...");
-                // Pass userId to server action
+                console.log(`[Jitsi] Requesting token for room: ${roomName}, as moderator: ${isModerator}`);
+                const startTime = Date.now();
                 const result = await getJitsiToken(roomName, userName, userId, userEmail, isModerator);
+                const duration = Date.now() - startTime;
+
+                console.log(`[Jitsi] Server responded in ${duration}ms`);
 
                 if (result.error) {
-                    console.error("[Jitsi] Server returned error:", result.error);
-                    setError(`Server Error: ${result.error}`);
+                    console.error("[Jitsi] Server error:", result.error);
+                    setError(`Classroom Security Error: ${result.error}`);
                 } else if (result.token) {
-                    console.log("[Jitsi] Token received successfully.");
+                    console.log(`[Jitsi] Token received. Length: ${result.token.length}`);
                     setToken(result.token);
                 } else {
-                    setError("Communication failure: No security token received.");
+                    setError("Security System Error: No token returned from authorization server.");
                 }
             } catch (err: any) {
-                console.error("[Jitsi] Network or Fetch error:", err);
-                setError(`Network Error: ${err.message || "Failed to contact classroom server."}`);
+                console.error("[Jitsi] Fetch/Network error:", err);
+                setError(`Connectivity Error: ${err.message || "Failed to reach security server."}`);
             }
         }
         fetchToken();

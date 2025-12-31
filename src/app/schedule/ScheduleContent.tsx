@@ -135,6 +135,7 @@ export default function ScheduleContent({ classes, user, globalRole, enrolledCla
                     }}
                     role={getActiveRole(activeClassroom.id)}
                 />
+                <script dangerouslySetInnerHTML={{ __html: `console.log("Room initialized:", "${activeClassroom.title.replace(/\s+/g, '-')}");` }} />
             </div>
         );
     }

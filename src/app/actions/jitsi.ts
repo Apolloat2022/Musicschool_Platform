@@ -17,7 +17,9 @@ export async function getJitsiToken(room: string, userName: string, userId: stri
             throw new Error("Missing Jitsi App ID on server.");
         }
 
-        const fullRoomName = room.startsWith(appId) ? room : `${appId}/${room}`;
+        const appIdClean = appId.trim();
+        const roomClean = room.trim();
+        const fullRoomName = roomClean.startsWith(appIdClean) ? roomClean : `${appIdClean}/${roomClean}`;
         console.log(`[Jitsi Action] Target Room: ${fullRoomName}`);
 
         // Vercel execution limit is often 10s on hobby plan. 

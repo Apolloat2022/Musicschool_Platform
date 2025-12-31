@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, Music, Sparkles, Award } from "lucide-react";
+import { SignInButton, UserButton, SignedIn, SignedOut } from "@clerk/nextjs";
 
 const programs = [
   {
@@ -29,6 +30,40 @@ const programs = [
 export default function HomePage() {
   return (
     <main className="min-h-screen bg-slate-950 text-white selection:bg-indigo-500/30">
+      {/* Navigation */}
+      <nav className="border-b border-slate-900 bg-slate-950/50 backdrop-blur-xl sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+          <div className="flex items-center gap-2 group">
+            <div className="p-1.5 bg-indigo-500/10 rounded-lg border border-indigo-500/20">
+              <div className="w-6 h-6 bg-indigo-500 rounded-sm flex items-center justify-center font-bold text-[10px]">A</div>
+            </div>
+            <div className="font-bold text-xl tracking-tight hidden sm:block">
+              Apollo <span className="text-indigo-500">Academy</span>
+            </div>
+          </div>
+          <div className="flex items-center gap-6">
+            <Link href="/schedule" className="text-sm font-medium text-slate-400 hover:text-white transition">Schedule</Link>
+            <div className="h-4 w-px bg-slate-800 mx-2" />
+            <SignedOut>
+              <SignInButton mode="modal">
+                <button className="text-sm font-bold bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2 rounded-xl transition shadow-lg shadow-indigo-600/20">
+                  Sign In
+                </button>
+              </SignInButton>
+            </SignedOut>
+            <SignedIn>
+              <UserButton
+                appearance={{
+                  elements: {
+                    userButtonAvatarBox: "w-10 h-10 border-2 border-indigo-500/20"
+                  }
+                }}
+              />
+            </SignedIn>
+          </div>
+        </div>
+      </nav>
+
       {/* Hero Section */}
       <div className="relative overflow-hidden pt-20 pb-12 px-6">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-6xl">
