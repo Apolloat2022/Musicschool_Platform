@@ -12,15 +12,43 @@ interface JitsiClassroomProps {
 
 export default function JitsiClassroom({ roomName, userName, userEmail }: JitsiClassroomProps) {
     const [token, setToken] = useState<string | null>(null);
-    const appId = process.env.NEXT_PUBLIC_JITSI_APP_ID || "YOUR_APP_ID"; // Should be passed or in public env
+    const [error, setError] = useState<string | null>(null);
+    const appId = process.env.NEXT_PUBLIC_JITSI_APP_ID;
 
     useEffect(() => {
+        const timeout = setTimeout(() => {
+            if (!token && !error) {
+                setError("Initialization timed out. This usually happens if the server action hangs or API keys are improperly configured.");
+            }
+        }, 15000); // 15 second timeout
+
         async function fetchToken() {
-            const result = await getJitsiToken(roomName, userName, userEmail);
-            if (result.token) setToken(result.token);
+            try {
+                const result = await getJitsiToken(roomName, userName, userEmail);
+                if (result.error) {
+                    setError(result.error);
+                } else if (result.token) {
+                    setToken(result.token);
+                } else {
+                    setError("No token received from server.");
+                }
+            } catch (err: any) {
+                setError(err.message || "An unexpected error occurred.");
+            }
         }
         fetchToken();
+
+        return () => clearTimeout(timeout);
     }, [roomName, userName, userEmail]);
+
+    if (error) {
+        return (
+            <div className="w-full h-[600px] bg-red-950/20 border-2 border-red-500/50 rounded-2xl p-10 flex flex-col items-center justify-center text-center">
+                <h3 className="text-xl font-bold text-red-400 mb-2">Classroom Secure Lock-out</h3>
+                <p className="text-red-300/70 max-w-md">{error}</p>
+            </div>
+        );
+    }
 
     if (!token) {
         return (

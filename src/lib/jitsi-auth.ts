@@ -8,11 +8,12 @@ export interface JitsiTokenOptions {
 }
 
 export function signJitsiToken(options: JitsiTokenOptions) {
-    const appId = process.env.JITSI_APPLE_API;
-    const privateKey = process.env.JITSI_PRIVATE_KEY?.replace(/\\n/g, '\n');
+    const appId = process.env.JITSI_APPLE_API || process.env.JITSI_API;
+    let privateKey = process.env.JITSI_PRIVATE_KEY?.replace(/\\n/g, '\n').trim();
+    const kid = process.env.JITSI_PUBLIC_KEY || appId;
 
     if (!appId || !privateKey) {
-        throw new Error("Jitsi App ID or Private Key not configured in environment.");
+        throw new Error("Jitsi Configuration Error: Application ID and Private Key are required.");
     }
 
     const payload = {
@@ -37,5 +38,6 @@ export function signJitsiToken(options: JitsiTokenOptions) {
         nbf: Math.floor(Date.now() / 1000) - 10,
     };
 
-    return jwt.sign(payload, privateKey, { algorithm: "RS256", keyid: process.env.JITSI_PUBLIC_KEY });
+    const signedToken = jwt.sign(payload, privateKey, { algorithm: "RS256", keyid: kid });
+    return signedToken;
 }
