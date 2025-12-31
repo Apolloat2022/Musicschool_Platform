@@ -7,16 +7,17 @@ import { getJitsiToken } from "@/app/actions/jitsi";
 interface JitsiClassroomProps {
     roomName: string;
     userName: string;
+    userId: string;
     userEmail?: string;
 }
 
-export default function JitsiClassroom({ roomName, userName, userEmail }: JitsiClassroomProps) {
+export default function JitsiClassroom({ roomName, userName, userId, userEmail }: JitsiClassroomProps) {
     const [token, setToken] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
     const appId = process.env.NEXT_PUBLIC_JITSI_APP_ID;
 
     useEffect(() => {
-        console.log(`[Jitsi] Initializing for room: ${roomName}, user: ${userName}`);
+        console.log(`[Jitsi] Initializing for room: ${roomName}, user: ${userName} (${userId})`);
 
         const timeout = setTimeout(() => {
             if (!token && !error) {
@@ -28,8 +29,8 @@ export default function JitsiClassroom({ roomName, userName, userEmail }: JitsiC
         async function fetchToken() {
             try {
                 console.log("[Jitsi] Requesting token from server...");
-                // Pass simple room name, let server prefix it with App ID
-                const result = await getJitsiToken(roomName, userName, userEmail);
+                // Pass userId to server action
+                const result = await getJitsiToken(roomName, userName, userId, userEmail);
 
                 if (result.error) {
                     console.error("[Jitsi] Server returned error:", result.error);
@@ -48,7 +49,7 @@ export default function JitsiClassroom({ roomName, userName, userEmail }: JitsiC
         fetchToken();
 
         return () => clearTimeout(timeout);
-    }, [roomName, userName, userEmail]);
+    }, [roomName, userName, userId, userEmail]);
 
     if (error) {
         return (

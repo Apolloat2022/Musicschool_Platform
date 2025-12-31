@@ -3,7 +3,7 @@
 
 import { signJitsiToken } from "@/lib/jitsi-auth";
 
-export async function getJitsiToken(room: string, userName: string, userEmail?: string) {
+export async function getJitsiToken(room: string, userName: string, userId: string, userEmail?: string) {
     if (room === "health-check") {
         return { token: "health-ok", error: null };
     }
@@ -11,7 +11,7 @@ export async function getJitsiToken(room: string, userName: string, userEmail?: 
     const appId = process.env.JITSI_APPLE_API || process.env.JITSI_API || process.env.NEXT_PUBLIC_JITSI_APP_ID;
 
     try {
-        console.log(`[Jitsi Action] Starting for room: ${room}`);
+        console.log(`[Jitsi Action] Starting for user: ${userName} (${userId}), room: ${room}`);
 
         if (!appId) {
             throw new Error("Missing Jitsi App ID on server.");
@@ -30,6 +30,7 @@ export async function getJitsiToken(room: string, userName: string, userEmail?: 
                 room: fullRoomName,
                 userName,
                 userEmail,
+                userId,
                 isModerator: false,
             }),
             timeoutPromise

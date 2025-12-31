@@ -3,6 +3,7 @@ import * as jose from "jose";
 export interface JitsiTokenOptions {
     room: string;
     userName: string;
+    userId: string;
     userEmail?: string;
     isModerator?: boolean;
 }
@@ -16,7 +17,7 @@ export async function signJitsiToken(options: JitsiTokenOptions) {
         throw new Error("Jitsi Configuration Error: Application ID and Private Key are required.");
     }
 
-    console.log(`[Jitsi Auth] STEP 1: Variables loaded. AppId=${appId ? 'OK' : 'MISSING'}, Key=${rawKey ? 'OK' : 'MISSING'}`);
+    console.log(`[Jitsi Auth] STEP 1: Variables loaded. AppId=${appId ? 'OK' : 'MISSING'}`);
 
     // Aggressive cleanup: remove all whitespace, quotes, then re-format as proper PEM
     let cleanKey = rawKey
@@ -41,9 +42,10 @@ export async function signJitsiToken(options: JitsiTokenOptions) {
             aud: "jitsi",
             iss: "chat",
             sub: appId,
-            room: options.room,
+            room: "*",
             context: {
                 user: {
+                    id: options.userId,
                     name: options.userName,
                     email: options.userEmail || "",
                     affiliation: options.isModerator ? "owner" : "member",
