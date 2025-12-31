@@ -1,8 +1,7 @@
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/request';
+import { NextResponse, NextRequest } from 'next/server';
 import { decrypt, isAdminAuthenticated } from '@/lib/auth-admin';
 
-export async function middleware(request: NextRequest) {
+export default async function proxy(request: NextRequest) {
     const path = request.nextUrl.pathname;
 
     // 1. Define sensitive routes
