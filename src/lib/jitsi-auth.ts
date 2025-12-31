@@ -43,7 +43,7 @@ export async function signJitsiToken(options: JitsiTokenOptions) {
         console.log(`[Jitsi Auth] STEP 4: Signing JWT...`);
         const token = await new jose.SignJWT({
             aud: "jitsi",
-            iss: appId,
+            iss: "chat",
             sub: appId,
             room: options.room === "*" ? "*" : options.room,
             context: {
