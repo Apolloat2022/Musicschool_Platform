@@ -7,6 +7,7 @@ import { musicClasses, enrollments } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import { setAdminSession } from '@/lib/auth-admin';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -42,7 +43,7 @@ export async function enrollStudent(formData: FormData) {
       .from(musicClasses)
       .where(eq(musicClasses.id, classId)) // Correct Drizzle syntax
       .limit(1);
-    
+
     await resend.emails.send({
       from: 'Music School <onboarding@resend.dev>', // Update this with your domain
       to: [studentEmail],
@@ -60,4 +61,19 @@ export async function enrollStudent(formData: FormData) {
 
   // 3. Redirect to Classroom
   redirect(`/classroom/${classId}`);
+}
+
+export async function loginAdmin(formData: FormData) {
+  const user = formData.get('user') as string;
+  const pass = formData.get('pass') as string;
+
+  const EXPECTED_USER = process.env.ADMIN_USER || "admin";
+  const EXPECTED_PASS = process.env.ADMIN_PASS || "apollo2025";
+
+  if (user === EXPECTED_USER && pass === EXPECTED_PASS) {
+    await setAdminSession(user);
+    redirect('/admin');
+  } else {
+    redirect('/admin/login?error=Invalid credentials');
+  }
 }
