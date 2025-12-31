@@ -55,7 +55,7 @@ export default function ScheduleContent({ classes, user, globalRole, enrolledCla
 
     const filteredClasses = useMemo(() => {
         return classes.filter(cls =>
-            selectedInstrument === "All" || cls.instrument.toLowerCase() === selectedInstrument.toLowerCase()
+            selectedInstrument === "All" || (cls.instrument?.toLowerCase() || "") === selectedInstrument.toLowerCase()
         );
     }, [selectedInstrument, classes]);
 
@@ -70,8 +70,8 @@ export default function ScheduleContent({ classes, user, globalRole, enrolledCla
         return { label: "Intermediate", color: "bg-blue-500/10 text-blue-500 border-blue-500/20" };
     };
 
-    const getInstrumentIcon = (instrument: string) => {
-        switch (instrument.toLowerCase()) {
+    const getInstrumentIcon = (instrument: string | null) => {
+        switch (instrument?.toLowerCase() || "") {
             case "guitar": return Guitar;
             case "violin": return Violin;
             case "cello": return Cello;
