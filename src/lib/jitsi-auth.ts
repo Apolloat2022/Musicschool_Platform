@@ -12,6 +12,10 @@ export function signJitsiToken(options: JitsiTokenOptions) {
     const rawKey = process.env.JITSI_PRIVATE_KEY;
     const kid = process.env.JITSI_PUBLIC_KEY || appId;
 
+    if (!appId || !rawKey) {
+        throw new Error("Jitsi Configuration Error: Application ID and Private Key are required.");
+    }
+
     // Aggressive cleanup: remove all whitespace, then re-format as proper PEM
     // This handles cases where Vercel might have added spaces, carriage returns, or literal \n
     let cleanKey = rawKey
