@@ -12,21 +12,18 @@ export function signJitsiToken(options: JitsiTokenOptions) {
     const rawKey = process.env.JITSI_PRIVATE_KEY;
     const kid = process.env.JITSI_PUBLIC_KEY || appId;
 
-    console.log(`[Jitsi Auth Check] AppId: ${appId ? 'OK' : 'MISSING'}`);
-    console.log(`[Jitsi Auth Check] PrivateKey: ${rawKey ? 'OK' : 'MISSING'}`);
-    console.log(`[Jitsi Auth Check] KID: ${kid ? 'OK' : 'MISSING'}`);
+    // Aggressive cleanup: remove all whitespace, then re-format as proper PEM
+    // This handles cases where Vercel might have added spaces, carriage returns, or literal \n
+    let cleanKey = rawKey
+        .replace(/-----BEGIN PRIVATE KEY-----/g, '')
+        .replace(/-----END PRIVATE KEY-----/g, '')
+        .replace(/\\n/g, '')
+        .replace(/\s/g, '');
 
-    if (!appId || !rawKey) {
-        const missing = [];
-        if (!appId) missing.push("App ID");
-        if (!rawKey) missing.push("Private Key");
-        const errorMsg = `Jitsi Configuration Error: Missing ${missing.join(" and ")}.`;
-        console.error(`[Jitsi Auth Error] ${errorMsg}`);
-        throw new Error(errorMsg);
-    }
+    // Reconstruct valid PEM
+    const privateKey = `-----BEGIN PRIVATE KEY-----\n${cleanKey.match(/.{1,64}/g)?.join('\n')}\n-----END PRIVATE KEY-----`;
 
-    // Handle both literal \n and real newlines
-    const privateKey = rawKey.replace(/\\n/g, '\n').trim();
+    console.log(`[Jitsi Auth] Key structured, size: ${privateKey.length}`);
 
     const payload = {
         aud: "jitsi",
@@ -50,6 +47,11 @@ export function signJitsiToken(options: JitsiTokenOptions) {
         nbf: Math.floor(Date.now() / 1000) - 10,
     };
 
-    const signedToken = jwt.sign(payload, privateKey, { algorithm: "RS256", keyid: kid });
-    return signedToken;
+    try {
+        const signedToken = jwt.sign(payload, privateKey, { algorithm: "RS256", keyid: kid });
+        return signedToken;
+    } catch (signError: any) {
+        console.error("[Jitsi Auth] JWT Sign Error:", signError.message);
+        throw new Error(`JWT Signing failed: ${signError.message}`);
+    }
 }
