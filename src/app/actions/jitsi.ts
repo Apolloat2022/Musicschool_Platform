@@ -3,7 +3,7 @@
 
 import { signJitsiToken } from "@/lib/jitsi-auth";
 
-export async function getJitsiToken(room: string, userName: string, userId: string, userEmail?: string) {
+export async function getJitsiToken(room: string, userName: string, userId: string, userEmail?: string, isModerator: boolean = false) {
     if (room === "health-check") {
         return { token: "health-ok", error: null };
     }
@@ -31,7 +31,7 @@ export async function getJitsiToken(room: string, userName: string, userId: stri
                 userName,
                 userEmail,
                 userId,
-                isModerator: false,
+                isModerator,
             }),
             timeoutPromise
         ]) as string;

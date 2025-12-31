@@ -15,12 +15,34 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
 
   if (!musicClass) notFound();
 
-  // In a real app, you would check the database for the user's subscription status
+  // 1. Determine User Role
+  let role: "MODERATOR" | "STUDENT" | "GUEST" = "GUEST";
+
+  if (user) {
+    // Check if user is an admin/instructor
+    const isAdmin = user.publicMetadata?.role === "admin" || user.publicMetadata?.role === "instructor";
+
+    if (isAdmin) {
+      role = "MODERATOR";
+    } else {
+      // Check if student is enrolled in this specific class
+      const enrollment = await db.query.enrollments.findFirst({
+        where: (enrollments, { and, eq }) => and(
+          eq(enrollments.classId, musicClass.id),
+          eq(enrollments.studentEmail, user.emailAddresses[0]?.emailAddress || "")
+        )
+      });
+
+      if (enrollment) {
+        role = "STUDENT";
+      }
+    }
+  }
+
   const mockUser = {
-    id: user?.id || "anonymous",
-    name: user?.firstName ? `${user.firstName} ${user.lastName}` : "Student",
+    id: user?.id || `guest-${Math.random().toString(36).substring(7)}`,
+    name: user?.firstName ? `${user.firstName} ${user.lastName}` : "Guest Student",
     email: user?.emailAddresses[0]?.emailAddress || "",
-    isPremium: true // Toggle based on your business logic
   };
 
   return (
@@ -34,6 +56,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
           googleCourseId: musicClass.googleCourseId || undefined,
           zoomMeetingNumber: musicClass.zoomMeetingNumber || undefined,
         }}
+        role={role}
       />
     </div>
   );

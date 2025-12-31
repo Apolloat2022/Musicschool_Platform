@@ -9,9 +9,10 @@ interface JitsiClassroomProps {
     userName: string;
     userId: string;
     userEmail?: string;
+    isModerator?: boolean;
 }
 
-export default function JitsiClassroom({ roomName, userName, userId, userEmail }: JitsiClassroomProps) {
+export default function JitsiClassroom({ roomName, userName, userId, userEmail, isModerator = false }: JitsiClassroomProps) {
     const [token, setToken] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
     const appId = process.env.NEXT_PUBLIC_JITSI_APP_ID;
@@ -30,7 +31,7 @@ export default function JitsiClassroom({ roomName, userName, userId, userEmail }
             try {
                 console.log("[Jitsi] Requesting token from server...");
                 // Pass userId to server action
-                const result = await getJitsiToken(roomName, userName, userId, userEmail);
+                const result = await getJitsiToken(roomName, userName, userId, userEmail, isModerator);
 
                 if (result.error) {
                     console.error("[Jitsi] Server returned error:", result.error);

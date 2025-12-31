@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import SmartClassroom from "./SmartClassroom";
+import SmartClassroom, { UserRole } from "./SmartClassroom";
 import AssignmentTab from "./AssignmentTab";
 import { Video, BookOpen, Music, Users, Info } from "lucide-react";
 
@@ -10,7 +10,6 @@ interface ClassroomViewProps {
         id: string;
         name: string;
         email: string;
-        isPremium: boolean;
     };
     classData: {
         title: string;
@@ -19,9 +18,10 @@ interface ClassroomViewProps {
         googleCourseId?: string;
         zoomMeetingNumber?: string;
     };
+    role: UserRole;
 }
 
-export default function ClassroomView({ user, classData }: ClassroomViewProps) {
+export default function ClassroomView({ user, classData, role }: ClassroomViewProps) {
     const [activeTab, setActiveTab] = useState<"live" | "materials">("live");
 
     return (
@@ -42,8 +42,8 @@ export default function ClassroomView({ user, classData }: ClassroomViewProps) {
                     <button
                         onClick={() => setActiveTab("live")}
                         className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all ${activeTab === "live"
-                                ? "bg-indigo-600 text-white shadow-lg"
-                                : "text-slate-500 hover:text-slate-300"
+                            ? "bg-indigo-600 text-white shadow-lg"
+                            : "text-slate-500 hover:text-slate-300"
                             }`}
                     >
                         <Video size={16} />
@@ -52,8 +52,8 @@ export default function ClassroomView({ user, classData }: ClassroomViewProps) {
                     <button
                         onClick={() => setActiveTab("materials")}
                         className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all ${activeTab === "materials"
-                                ? "bg-indigo-600 text-white shadow-lg"
-                                : "text-slate-500 hover:text-slate-300"
+                            ? "bg-indigo-600 text-white shadow-lg"
+                            : "text-slate-500 hover:text-slate-300"
                             }`}
                     >
                         <BookOpen size={16} />
@@ -72,6 +72,7 @@ export default function ClassroomView({ user, classData }: ClassroomViewProps) {
                                 roomName: classData.roomName,
                                 meetingNumber: classData.zoomMeetingNumber,
                             }}
+                            role={role}
                         />
                     </div>
                 ) : (

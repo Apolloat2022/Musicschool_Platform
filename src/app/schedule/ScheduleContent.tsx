@@ -32,7 +32,6 @@ const mockUser = {
     id: "user_1",
     name: "John Doe",
     email: "john@example.com",
-    isPremium: true
 };
 
 export default function ScheduleContent({ classes }: { classes: any[] }) {
@@ -89,6 +88,7 @@ export default function ScheduleContent({ classes }: { classes: any[] }) {
                         meetingNumber: "123456789",
                         password: "test"
                     }}
+                    role="STUDENT"
                 />
             </div>
         );
@@ -108,8 +108,8 @@ export default function ScheduleContent({ classes }: { classes: any[] }) {
                             key={inst.name}
                             onClick={() => setSelectedInstrument(inst.name)}
                             className={`flex items-center gap-2 px-5 py-2.5 rounded-full border transition-all whitespace-nowrap ${selectedInstrument === inst.name
-                                    ? "bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-600/20"
-                                    : "bg-slate-900/50 border-slate-800 text-slate-400 hover:border-slate-700"
+                                ? "bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-600/20"
+                                : "bg-slate-900/50 border-slate-800 text-slate-400 hover:border-slate-700"
                                 }`}
                         >
                             <inst.icon size={16} />
