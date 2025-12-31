@@ -6,8 +6,10 @@ export const musicClasses = pgTable("music_classes", {
   title: text("title").notNull(),
   instrument: text("instrument"),
   dayOfWeek: text("day_of_week"),
-  startTime: text("start_time"), 
+  startTime: text("start_time"),
   jitsiRoomName: text("jitsi_room_name").unique(),
+  googleCourseId: text("google_course_id"),
+  zoomMeetingNumber: text("zoom_meeting_number"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
