@@ -16,22 +16,22 @@ export function signJitsiToken(options: JitsiTokenOptions) {
         throw new Error("Jitsi Configuration Error: Application ID and Private Key are required.");
     }
 
-    // Aggressive cleanup: remove all whitespace, then re-format as proper PEM
-    // This handles cases where Vercel might have added spaces, carriage returns, or literal \n
+    // Aggressive cleanup: remove all whitespace, quotes, then re-format as proper PEM
     let cleanKey = rawKey
         .replace(/-----BEGIN PRIVATE KEY-----/g, '')
         .replace(/-----END PRIVATE KEY-----/g, '')
         .replace(/\\n/g, '')
+        .replace(/["']/g, '') // Remove any accidental quotes from Vercel UI
         .replace(/\s/g, '');
+
+    console.log(`[Jitsi Auth] Raw Key Length: ${rawKey.length}, Cleaned: ${cleanKey.length}`);
 
     // Reconstruct valid PEM
     const privateKey = `-----BEGIN PRIVATE KEY-----\n${cleanKey.match(/.{1,64}/g)?.join('\n')}\n-----END PRIVATE KEY-----`;
 
-    console.log(`[Jitsi Auth] Key structured, size: ${privateKey.length}`);
-
     const payload = {
         aud: "jitsi",
-        iss: "chat",
+        iss: appId, // MUST be the App ID for JaaS (8x8.vc)
         sub: appId,
         room: options.room === "*" ? "*" : options.room,
         context: {
@@ -52,10 +52,12 @@ export function signJitsiToken(options: JitsiTokenOptions) {
     };
 
     try {
+        console.log(`[Jitsi Auth] Signing token...`);
         const signedToken = jwt.sign(payload, privateKey, { algorithm: "RS256", keyid: kid });
+        console.log(`[Jitsi Auth] Token signed successfully.`);
         return signedToken;
     } catch (signError: any) {
         console.error("[Jitsi Auth] JWT Sign Error:", signError.message);
-        throw new Error(`JWT Signing failed: ${signError.message}`);
+        throw signError;
     }
 }
