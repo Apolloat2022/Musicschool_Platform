@@ -28,19 +28,12 @@ export async function signJitsiToken(options: JitsiTokenOptions) {
 
     console.log(`[Jitsi Auth] STEP 2: Key cleaned. Length: ${cleanKey.length}`);
 
-    // Reconstruct valid PEM
-    const matches = cleanKey.match(/.{1,64}/g);
-    if (!matches) {
-        console.error(`[Jitsi Auth] ERROR: Key match failed. Cleaned content: "${cleanKey.substring(0, 10)}..."`);
-        throw new Error("Jitsi Configuration Error: Private Key data is corrupt or empty.");
-    }
-    const privateKeyPEM = `-----BEGIN PRIVATE KEY-----\n${matches.join('\n')}\n-----END PRIVATE KEY-----`;
+    // Simplified PEM reconstruction
+    const privateKeyPEM = `-----BEGIN PRIVATE KEY-----\n${cleanKey.replace(/(.{64})/g, "$1\n")}\n-----END PRIVATE KEY-----`;
 
     try {
-        console.log(`[Jitsi Auth] STEP 3: Importing PKCS8...`);
         const privateKey = await jose.importPKCS8(privateKeyPEM, "RS256");
 
-        console.log(`[Jitsi Auth] STEP 4: Signing JWT...`);
         const token = await new jose.SignJWT({
             aud: "jitsi",
             iss: "chat",
@@ -51,25 +44,17 @@ export async function signJitsiToken(options: JitsiTokenOptions) {
                     name: options.userName,
                     email: options.userEmail || "",
                     affiliation: options.isModerator ? "owner" : "member",
-                },
-                features: {
-                    livestreaming: "true",
-                    recording: "true",
-                    transcription: "true",
-                    "outbound-call": "false",
-                },
+                }
             },
         })
             .setProtectedHeader({ alg: "RS256", kid: kid })
             .setIssuedAt()
             .setExpirationTime("1h")
-            .setNotBefore("10s ago")
             .sign(privateKey);
 
-        console.log(`[Jitsi Auth] STEP 5: Signing successful.`);
         return token;
     } catch (error: any) {
-        console.error(`[Jitsi Auth] ERROR during ${error.message.includes('Importing') ? 'Import' : 'Sign'}:`, error.message);
+        console.error(`[Jitsi Auth] Error:`, error.message);
         throw error;
     }
 }
