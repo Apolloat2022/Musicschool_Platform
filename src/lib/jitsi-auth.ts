@@ -16,6 +16,8 @@ export async function signJitsiToken(options: JitsiTokenOptions) {
         throw new Error("Jitsi Configuration Error: Application ID and Private Key are required.");
     }
 
+    console.log(`[Jitsi Auth] STEP 1: Variables loaded. AppId=${appId ? 'OK' : 'MISSING'}, Key=${rawKey ? 'OK' : 'MISSING'}`);
+
     // Aggressive cleanup: remove all whitespace, quotes, then re-format as proper PEM
     let cleanKey = rawKey
         .replace(/-----BEGIN PRIVATE KEY-----/g, '')
@@ -24,20 +26,21 @@ export async function signJitsiToken(options: JitsiTokenOptions) {
         .replace(/["']/g, '') // Remove any accidental quotes from Vercel UI
         .replace(/\s/g, '');
 
-    console.log(`[Jitsi Auth] Key processing started. Cleaned length: ${cleanKey.length}`);
+    console.log(`[Jitsi Auth] STEP 2: Key cleaned. Length: ${cleanKey.length}`);
 
     // Reconstruct valid PEM
     const matches = cleanKey.match(/.{1,64}/g);
     if (!matches) {
+        console.error(`[Jitsi Auth] ERROR: Key match failed. Cleaned content: "${cleanKey.substring(0, 10)}..."`);
         throw new Error("Jitsi Configuration Error: Private Key data is corrupt or empty.");
     }
     const privateKeyPEM = `-----BEGIN PRIVATE KEY-----\n${matches.join('\n')}\n-----END PRIVATE KEY-----`;
 
     try {
-        console.log(`[Jitsi Auth] Importing private key...`);
+        console.log(`[Jitsi Auth] STEP 3: Importing PKCS8...`);
         const privateKey = await jose.importPKCS8(privateKeyPEM, "RS256");
 
-        console.log(`[Jitsi Auth] Signing token with jose...`);
+        console.log(`[Jitsi Auth] STEP 4: Signing JWT...`);
         const token = await new jose.SignJWT({
             aud: "jitsi",
             iss: appId,
@@ -63,10 +66,10 @@ export async function signJitsiToken(options: JitsiTokenOptions) {
             .setNotBefore("10s ago")
             .sign(privateKey);
 
-        console.log(`[Jitsi Auth] Token signed successfully with jose.`);
+        console.log(`[Jitsi Auth] STEP 5: Signing successful.`);
         return token;
     } catch (error: any) {
-        console.error("[Jitsi Auth] Jose sign error:", error.message);
+        console.error(`[Jitsi Auth] ERROR during ${error.message.includes('Importing') ? 'Import' : 'Sign'}:`, error.message);
         throw error;
     }
 }
