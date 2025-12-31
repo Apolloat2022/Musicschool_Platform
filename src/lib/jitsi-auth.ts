@@ -47,7 +47,13 @@ export async function signJitsiToken(options: JitsiTokenOptions) {
                     name: options.userName,
                     email: options.userEmail || "",
                     affiliation: options.isModerator ? "owner" : "member",
-                }
+                },
+                features: {
+                    livestreaming: "true",
+                    recording: "true",
+                    transcription: "true",
+                    "outbound-call": "false",
+                },
             },
         })
             .setProtectedHeader({ alg: "RS256", kid: kid })
