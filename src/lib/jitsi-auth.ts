@@ -39,9 +39,9 @@ export async function signJitsiToken(options: JitsiTokenOptions) {
 
         const payload = {
             aud: "jitsi",
-            iss: "chat", // Reverted to 'chat' as suggested by Jitsi error message
+            iss: "chat",
             sub: appId,
-            room: "*", // Keep wildcard for broad permission
+            room: "*",
             context: {
                 user: {
                     id: options.userId,
@@ -61,7 +61,7 @@ export async function signJitsiToken(options: JitsiTokenOptions) {
         console.log(`[Jitsi Auth] Signing Payload:`, JSON.stringify(payload, null, 2));
 
         const token = await new jose.SignJWT(payload)
-            .setProtectedHeader({ alg: "RS256", kid: kid })
+            .setProtectedHeader({ alg: "RS256", kid: kid, typ: "JWT" })
             .setIssuedAt()
             .setNotBefore(Math.floor(Date.now() / 1000) - 60) // 1 minute in the past to prevent clock drift
             .setExpirationTime("1h")

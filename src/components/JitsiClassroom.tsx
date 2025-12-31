@@ -69,6 +69,17 @@ export default function JitsiClassroom({ roomName, userName, userId, userEmail, 
                 >
                     Retry Connection
                 </button>
+                {token && (
+                    <button
+                        onClick={() => {
+                            navigator.clipboard.writeText(token);
+                            alert("Security token copied to clipboard! You can now paste it into JWT.io for analysis.");
+                        }}
+                        className="mt-4 text-xs text-red-400 underline hover:text-red-300"
+                    >
+                        Copy Security Token for Debugging
+                    </button>
+                )}
             </div>
         );
     }
