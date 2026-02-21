@@ -5,7 +5,7 @@ import type { NextRequest } from "next/server";
 
 // 1. Define routes that should be protected by custom Admin logic
 const isAdminPath = (path: string) =>
-    (path.startsWith('/admin') && path !== '/admin/login') ||
+    (path.startsWith('/admin') && path !== '/admin/login' && path !== '/admin/forgot-password') ||
     path.startsWith('/faculty/dashboard');
 
 export default clerkMiddleware(async (auth, req: NextRequest) => {
