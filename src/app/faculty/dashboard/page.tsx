@@ -1,10 +1,21 @@
 import DashboardContent from "./DashboardContent";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
+import { db } from "@/lib/db";
+import { musicClasses } from "@/lib/db/schema";
 
 export const dynamic = "force-dynamic";
 
-export default function FacultyDashboardPage() {
+export default async function FacultyDashboardPage() {
+    const classes = await db
+        .select({
+            id: musicClasses.id,
+            title: musicClasses.title,
+            googleCourseId: musicClasses.googleCourseId,
+        })
+        .from(musicClasses)
+        .orderBy(musicClasses.id);
+
     return (
         <main className="min-h-screen bg-slate-950 text-white selection:bg-indigo-500/30">
             <nav className="border-b border-slate-900 bg-slate-950/50 backdrop-blur-xl sticky top-0 z-50">
@@ -30,7 +41,7 @@ export default function FacultyDashboardPage() {
                 </div>
             </nav>
 
-            <DashboardContent />
+            <DashboardContent classes={classes} />
 
             <footer className="py-12 text-center border-t border-slate-900 mt-12">
                 <p className="text-slate-500 text-sm">
