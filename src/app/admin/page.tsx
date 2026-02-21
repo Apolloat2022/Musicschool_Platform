@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import { musicClasses, enrollments } from "@/lib/db/schema";
-import { createClass, deleteClass } from "@/lib/actions";
-import { Music, Plus, Video, Trash2 } from "lucide-react";
+import { createClass, deleteClass, logoutAction } from "@/lib/actions";
+import { Music, Plus, Video, Trash2, Home, LogOut } from "lucide-react";
 import Link from "next/link";
 import { eq } from "drizzle-orm";
 
@@ -12,7 +12,19 @@ export default async function AdminPage() {
   return (
     <div className="min-h-screen bg-slate-50 p-6 md:p-12 text-black">
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-3xl font-bold mb-8">Teacher Dashboard</h1>
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold">Teacher Dashboard</h1>
+          <div className="flex gap-4">
+            <Link href="/" className="bg-white border text-slate-700 hover:text-indigo-600 px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 transition-colors">
+              <Home size={18} /> Home Page
+            </Link>
+            <form action={logoutAction}>
+              <button type="submit" className="bg-white border hover:bg-red-50 text-slate-700 hover:text-red-600 px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 transition-colors">
+                <LogOut size={18} /> Logout
+              </button>
+            </form>
+          </div>
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="bg-white p-6 rounded-2xl border">

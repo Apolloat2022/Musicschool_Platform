@@ -7,7 +7,12 @@ import { musicClasses, enrollments } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { setAdminSession } from '@/lib/auth-admin';
+import { setAdminSession, logoutAdmin } from '@/lib/auth-admin';
+
+export async function logoutAction() {
+  await logoutAdmin();
+  redirect('/');
+}
 
 export async function createClass(formData: FormData) {
   const title = formData.get('title') as string;
