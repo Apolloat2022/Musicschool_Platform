@@ -3,38 +3,74 @@
 import { loginAdmin } from "@/lib/actions";
 import { Lock, User, Music, ArrowRight } from "lucide-react";
 import { useSearchParams } from "next/navigation";
-import Image from "next/image";
 import Link from "next/link";
-import { Suspense } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
+
+const REMEMBER_KEY = "admin_saved_user";
 
 function LoginForm() {
     const searchParams = useSearchParams();
     const error = searchParams.get("error");
+    const userInputRef = useRef<HTMLInputElement>(null);
+    const [rememberMe, setRememberMe] = useState(false);
+    const [savedUser, setSavedUser] = useState("");
+
+    // Load saved username on mount
+    useEffect(() => {
+        const saved = localStorage.getItem(REMEMBER_KEY);
+        if (saved) {
+            setSavedUser(saved);
+            setRememberMe(true);
+        }
+    }, []);
+
+    // Save or clear username before form submission
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        const userVal = userInputRef.current?.value || "";
+        if (rememberMe && userVal) {
+            localStorage.setItem(REMEMBER_KEY, userVal);
+        } else {
+            localStorage.removeItem(REMEMBER_KEY);
+        }
+        // Let the native form action continue
+    };
 
     return (
-        <form action={loginAdmin} className="space-y-6">
+        <form action={loginAdmin} onSubmit={handleSubmit} className="space-y-6">
             {error && (
                 <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm text-center animate-in fade-in zoom-in duration-300">
                     {error}
                 </div>
             )}
 
+            {/* User ID */}
             <div className="space-y-2">
                 <label className="text-xs font-bold uppercase tracking-widest text-slate-500 px-1">User ID</label>
                 <div className="relative group">
                     <User className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-indigo-500 transition-colors" size={20} />
                     <input
+                        ref={userInputRef}
                         name="user"
                         type="text"
                         required
+                        defaultValue={savedUser}
                         placeholder="Enter admin ID"
                         className="w-full bg-slate-900 border border-slate-800 rounded-2xl pl-12 pr-4 py-4 text-white focus:border-indigo-500 outline-none transition-all shadow-inner shadow-black/20"
                     />
                 </div>
             </div>
 
+            {/* Password */}
             <div className="space-y-2">
-                <label className="text-xs font-bold uppercase tracking-widest text-slate-500 px-1">Password</label>
+                <div className="flex items-center justify-between px-1">
+                    <label className="text-xs font-bold uppercase tracking-widest text-slate-500">Password</label>
+                    <Link
+                        href="/admin/forgot-password"
+                        className="text-xs font-semibold text-indigo-400 hover:text-indigo-300 transition-colors"
+                    >
+                        Forgot Password?
+                    </Link>
+                </div>
                 <div className="relative group">
                     <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-indigo-500 transition-colors" size={20} />
                     <input
@@ -47,6 +83,30 @@ function LoginForm() {
                 </div>
             </div>
 
+            {/* Remember Me */}
+            <label className="flex items-center gap-3 cursor-pointer group">
+                <div className="relative">
+                    <input
+                        type="checkbox"
+                        checked={rememberMe}
+                        onChange={(e) => setRememberMe(e.target.checked)}
+                        className="sr-only peer"
+                    />
+                    <div className="w-5 h-5 rounded-md border-2 border-slate-700 bg-slate-900 peer-checked:bg-indigo-600 peer-checked:border-indigo-600 transition-all flex items-center justify-center">
+                        <svg
+                            className={`w-3 h-3 text-white transition-opacity ${rememberMe ? "opacity-100" : "opacity-0"}`}
+                            fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}
+                        >
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                    </div>
+                </div>
+                <span className="text-sm text-slate-400 group-hover:text-slate-300 transition-colors select-none">
+                    Remember my username
+                </span>
+            </label>
+
+            {/* Submit */}
             <button
                 type="submit"
                 className="group w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-5 rounded-2xl transition-all shadow-xl shadow-indigo-600/20 active:scale-[0.98] flex items-center justify-center gap-2"
@@ -61,7 +121,7 @@ function LoginForm() {
 export default function AdminLoginPage() {
     return (
         <div className="min-h-screen bg-slate-950 flex items-center justify-center p-6 selection:bg-indigo-500/30">
-            {/* Background elements */}
+            {/* Background glow */}
             <div className="fixed inset-0 overflow-hidden pointer-events-none">
                 <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-600/10 blur-[120px] rounded-full" />
                 <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-amber-600/5 blur-[120px] rounded-full" />
