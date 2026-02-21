@@ -9,8 +9,6 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { setAdminSession } from '@/lib/auth-admin';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 export async function createClass(formData: FormData) {
   const title = formData.get('title') as string;
   const instrument = formData.get('instrument') as string;
@@ -25,6 +23,17 @@ export async function createClass(formData: FormData) {
   revalidatePath('/admin');
 }
 
+export async function deleteClass(formData: FormData) {
+  const classId = parseInt(formData.get('classId') as string);
+
+  // Delete enrollments first (foreign key constraint)
+  await db.delete(enrollments).where(eq(enrollments.classId, classId));
+  // Then delete the class
+  await db.delete(musicClasses).where(eq(musicClasses.id, classId));
+
+  revalidatePath('/admin');
+}
+
 export async function enrollStudent(formData: FormData) {
   const classId = parseInt(formData.get('classId') as string);
   const studentName = formData.get('studentName') as string;
@@ -35,28 +44,32 @@ export async function enrollStudent(formData: FormData) {
     classId, studentName, studentEmail
   });
 
-  // 2. Send Welcome Email
-  try {
-    // Fetch class details for the email
-    const [classInfo] = await db
-      .select()
-      .from(musicClasses)
-      .where(eq(musicClasses.id, classId)) // Correct Drizzle syntax
-      .limit(1);
+  // 2. Send Welcome Email (only if RESEND_API_KEY is configured)
+  if (process.env.RESEND_API_KEY) {
+    try {
+      const resend = new Resend(process.env.RESEND_API_KEY);
 
-    await resend.emails.send({
-      from: 'Music School <onboarding@resend.dev>', // Update this with your domain
-      to: [studentEmail],
-      subject: 'Your Lesson Confirmation',
-      react: WelcomeEmail({
-        studentName,
-        className: classInfo?.title || "Music Class",
-        classroomUrl: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/classroom/${classId}`
-      }),
-    });
-  } catch (error) {
-    console.error("Email failed to send, but student was enrolled:", error);
-    // Don't throw here - we still want to redirect to classroom even if email fails
+      const [classInfo] = await db
+        .select()
+        .from(musicClasses)
+        .where(eq(musicClasses.id, classId))
+        .limit(1);
+
+      await resend.emails.send({
+        from: 'Music School <onboarding@resend.dev>',
+        to: [studentEmail],
+        subject: 'Your Lesson Confirmation',
+        react: WelcomeEmail({
+          studentName,
+          className: classInfo?.title || "Music Class",
+          classroomUrl: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/classroom/${classId}`
+        }),
+      });
+    } catch (error) {
+      console.error("Email failed to send, but student was enrolled:", error);
+    }
+  } else {
+    console.warn("RESEND_API_KEY not set — welcome email skipped.");
   }
 
   // 3. Redirect to Classroom
