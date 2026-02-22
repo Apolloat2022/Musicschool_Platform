@@ -20,7 +20,23 @@ async function getAccessToken() {
     return token;
 }
 
+function getNumericCourseId(idInput: string): string {
+    // If the input is already numeric, return it
+    if (/^\d+$/.test(idInput)) return idInput;
+
+    try {
+        // Decode Base64 string to see if it reveals the numeric ID
+        const decoded = Buffer.from(idInput, 'base64').toString('utf-8');
+        // Regex to extract the first long number found in the decoded string
+        const match = decoded.match(/\d{10,}/);
+        return match ? match[0] : idInput;
+    } catch (e) {
+        return idInput; // Fallback to original if decoding fails
+    }
+}
+
 export async function syncRosterAction(courseId: string) {
+    courseId = getNumericCourseId(courseId);
     try {
         const token = await getAccessToken();
         const students = await syncClassroomRoster(token, courseId);
@@ -36,6 +52,7 @@ export async function postHomeworkAction(
     courseId: string,
     homework: { title: string; description: string; link: string }
 ) {
+    courseId = getNumericCourseId(courseId);
     try {
         const token = await getAccessToken();
         const result = await postHomework(token, courseId, homework);
@@ -48,6 +65,7 @@ export async function postHomeworkAction(
 }
 
 export async function getAssignmentsAction(courseId: string) {
+    courseId = getNumericCourseId(courseId);
     try {
         const token = await getAccessToken();
         const assignments = await getAssignments(token, courseId);
@@ -63,6 +81,7 @@ export async function postNoteAction(
     courseId: string,
     note: { title: string; text: string }
 ) {
+    courseId = getNumericCourseId(courseId);
     try {
         const token = await getAccessToken();
         const result = await postNote(token, courseId, note);
@@ -75,6 +94,7 @@ export async function postNoteAction(
 }
 
 export async function getAnnouncementsAction(courseId: string) {
+    courseId = getNumericCourseId(courseId);
     try {
         const token = await getAccessToken();
         const announcements = await getCourseAnnouncements(token, courseId);
@@ -90,6 +110,7 @@ export async function getAnnouncementsAction(courseId: string) {
  * Links an existing music class in the DB to a Google Classroom course ID.
  */
 export async function linkCourseIdAction(classId: number, courseId: string) {
+    courseId = getNumericCourseId(courseId);
     try {
         await db
             .update(musicClasses)
