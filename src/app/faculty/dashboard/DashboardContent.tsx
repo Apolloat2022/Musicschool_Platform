@@ -166,7 +166,11 @@ export default function FacultyDashboard({ classes }: FacultyDashboardProps) {
                                 setMsg(null);
                                 // Auto-populate Roster on Tab Change
                                 if (!courseId) {
-                                    const linkedClass = classes.find((c) => c.googleCourseId);
+                                    // Try to use the currently selected class in the Link section first
+                                    const linkedClass =
+                                        (linkClassId && classes.find(c => c.id === parseInt(linkClassId) && c.googleCourseId)) ||
+                                        [...classes].reverse().find(c => c.googleCourseId); // Fallback: try the last recorded one
+
                                     if (linkedClass?.googleCourseId) {
                                         setCourseId(linkedClass.googleCourseId);
                                     }
