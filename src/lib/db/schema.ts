@@ -11,6 +11,7 @@ export const musicClasses = pgTable("music_classes", {
   googleCourseId: text("google_course_id"),
   zoomMeetingNumber: text("zoom_meeting_number"),
   createdAt: timestamp("created_at").defaultNow(),
+  teacherName: text("teacher_name").default("TBA"),
 });
 
 export const enrollments = pgTable("enrollments", {

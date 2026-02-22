@@ -31,6 +31,7 @@ export default async function AdminPage() {
             <h2 className="text-xl font-bold mb-4 flex items-center gap-2"><Plus /> New Class</h2>
             <form action={createClass} className="space-y-4">
               <input name="title" placeholder="Class Title" className="w-full p-3 border rounded-xl" required />
+              <input name="teacherName" placeholder="Teacher Name" className="w-full p-3 border rounded-xl" required />
               <input name="instrument" placeholder="Instrument" className="w-full p-3 border rounded-xl" required />
               <input name="dayOfWeek" placeholder="Day (e.g. Monday)" className="w-full p-3 border rounded-xl" required />
               <input name="startTime" type="time" className="w-full p-3 border rounded-xl" required />
@@ -44,7 +45,9 @@ export default async function AdminPage() {
               <div key={c.id} className="bg-white p-5 rounded-2xl border flex justify-between items-center gap-4">
                 <div>
                   <h3 className="font-bold">{c.title}</h3>
-                  <p className="text-slate-500 text-sm">{c.instrument} | {c.dayOfWeek} at {c.startTime}</p>
+                  <p className="text-slate-500 text-sm">
+                    {c.instrument} {c.teacherName && c.teacherName !== "TBA" ? `(taught by ${c.teacherName})` : ""} | {c.dayOfWeek} at {c.startTime}
+                  </p>
                 </div>
                 <div className="flex gap-2 shrink-0">
                   <Link href={`/enroll/${c.id}`} className="text-indigo-600 px-3 py-2 border rounded-lg text-xs font-bold">Enroll Link</Link>

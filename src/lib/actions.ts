@@ -16,13 +16,14 @@ export async function logoutAction() {
 
 export async function createClass(formData: FormData) {
   const title = formData.get('title') as string;
+  const teacherName = formData.get('teacherName') as string;
   const instrument = formData.get('instrument') as string;
   const dayOfWeek = formData.get('dayOfWeek') as string;
   const startTime = formData.get('startTime') as string;
   const jitsiRoomName = `MusicSchool-${Math.random().toString(36).substring(7)}`;
 
   await db.insert(musicClasses).values({
-    title, instrument, dayOfWeek, startTime, jitsiRoomName,
+    title, teacherName, instrument, dayOfWeek, startTime, jitsiRoomName,
   });
 
   revalidatePath('/admin');
