@@ -5,8 +5,9 @@ import type { NextRequest } from "next/server";
 
 // 1. Define routes that should be protected by custom Admin logic
 const isAdminPath = (path: string) =>
-    (path.startsWith('/admin') && path !== '/admin/login' && path !== '/admin/forgot-password') ||
-    path.startsWith('/faculty/dashboard');
+    path.startsWith('/admin') && path !== '/admin/login' && path !== '/admin/forgot-password';
+
+const isFacultyPath = createRouteMatcher(['/faculty/dashboard(.*)']);
 
 export default clerkMiddleware(async (auth, req: NextRequest) => {
     const path = req.nextUrl.pathname;
@@ -30,9 +31,14 @@ export default clerkMiddleware(async (auth, req: NextRequest) => {
             url.searchParams.set('error', 'Authentication required');
             return NextResponse.redirect(url);
         }
+        return NextResponse.next();
     }
 
-    // Fallback to normal Clerk behavior
+    // Use Clerk to protect Teacher portal
+    if (isFacultyPath(req)) {
+        await auth.protect();
+    }
+
     return NextResponse.next();
 });
 
