@@ -68,6 +68,13 @@ export default function FacultyDashboard({ classes }: FacultyDashboardProps) {
         }
     }, [linkClassId, classes]);
 
+    // Update the Roster/Homework courseId state automatically
+    useEffect(() => {
+        if (linkCourseInput) {
+            setCourseId(linkCourseInput);
+        }
+    }, [linkCourseInput]);
+
     const flash = (type: "success" | "error", text: string) => {
         setMsg({ type, text });
         setTimeout(() => setMsg(null), 5000);
@@ -154,7 +161,17 @@ export default function FacultyDashboard({ classes }: FacultyDashboardProps) {
                     {tabs.map((t) => (
                         <button
                             key={t.id}
-                            onClick={() => { setActiveTab(t.id); setMsg(null); }}
+                            onClick={() => {
+                                setActiveTab(t.id);
+                                setMsg(null);
+                                // Auto-populate Roster on Tab Change
+                                if (!courseId) {
+                                    const linkedClass = classes.find((c) => c.googleCourseId);
+                                    if (linkedClass?.googleCourseId) {
+                                        setCourseId(linkedClass.googleCourseId);
+                                    }
+                                }
+                            }}
                             className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === t.id ? "bg-indigo-600 text-white shadow-lg" : "text-slate-400 hover:text-white"}`}
                         >
                             {t.icon}{t.label}
@@ -250,7 +267,7 @@ export default function FacultyDashboard({ classes }: FacultyDashboardProps) {
                                     </div>
                                 </div>
                                 <div className="flex justify-end">
-                                    <button type="submit" disabled={isPosting} className="group flex items-center gap-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-10 py-4 rounded-2xl transition-all shadow-xl shadow-indigo-600/20 active:scale-95 disabled:opacity-50">
+                                    <button type="submit" disabled={isPosting || !courseId} className="group flex items-center gap-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-10 py-4 rounded-2xl transition-all shadow-xl shadow-indigo-600/20 active:scale-95 disabled:opacity-50">
                                         {isPosting ? <RefreshCw className="animate-spin" size={20} /> : <Send size={20} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />}
                                         Post to Google Classroom
                                     </button>
