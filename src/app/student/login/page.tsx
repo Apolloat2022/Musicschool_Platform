@@ -29,7 +29,7 @@ export default function StudentLoginPage() {
                 <div className="flex justify-center">
                     <SignIn
                         routing="hash"
-                        forceRedirectUrl="/"
+                        forceRedirectUrl="/student/dashboard"
                         appearance={{
                             variables: {
                                 colorPrimary: "#6366f1",
