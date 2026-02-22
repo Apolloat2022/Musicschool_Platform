@@ -21,18 +21,49 @@ async function getAccessToken() {
 }
 
 function getNumericCourseId(idInput: string): string {
-    // If the input is already numeric, return it
-    if (/^\d+$/.test(idInput)) return idInput;
+    // 1. Try to extract from a full Google Classroom URL
+    // Supports: https://classroom.google.com/c/385615069755 or https://classroom.google.com/c/Mzg1NjE1MDY5NzU1
+    const urlMatch = idInput.match(/\/c\/([a-zA-Z0-9_-]+)/);
+    const extractedId = urlMatch ? urlMatch[1] : idInput.trim();
 
+    // 2. If the extracted ID is already numeric, return it compliance-ready
+    if (/^\d+$/.test(extractedId)) return extractedId;
+
+    // 3. Fallback: Decode Base64 string to see if it reveals the numeric ID
     try {
-        // Decode Base64 string to see if it reveals the numeric ID
-        const decoded = Buffer.from(idInput, 'base64').toString('utf-8');
-        // Regex to extract the first long number found in the decoded string
+        const decoded = Buffer.from(extractedId, 'base64').toString('utf-8');
         const match = decoded.match(/\d{10,}/);
-        return match ? match[0] : idInput;
+        return match ? match[0] : extractedId;
     } catch (e) {
-        return idInput; // Fallback to original if decoding fails
+        return extractedId;
     }
+}
+
+/**
+ * Standardized error handler for Google APIs to log detail for Vercel
+ * and return user-friendly strings for 403 and 404 constraints.
+ */
+function handleGoogleApiError(error: unknown, context: string) {
+    let msg = "Unknown error";
+    let status: number | undefined;
+
+    if (typeof error === "object" && error !== null) {
+        const gError = error as any;
+        msg = gError.message || msg;
+        status = gError.status || gError.response?.status || gError.code;
+    } else if (error instanceof Error) {
+        msg = error.message;
+    }
+
+    // Map common Google Classroom API HTTP status errors
+    if (status === 404) {
+        msg = "Course Not Found (404). The ID provided does not exist or you are not enrolled as an active teacher.";
+    } else if (status === 403) {
+        msg = "Forbidden (403). You do not have sufficient permissions to access or modify this course.";
+    }
+
+    console.error(`[Google API Error | ${context}] Status: ${status || 'N/A'} -`, error);
+    return msg;
 }
 
 export async function syncRosterAction(courseId: string) {
@@ -42,8 +73,7 @@ export async function syncRosterAction(courseId: string) {
         const students = await syncClassroomRoster(token, courseId);
         return { students, error: null };
     } catch (error: unknown) {
-        const msg = error instanceof Error ? error.message : "Unknown error";
-        console.error("Roster sync failed:", error);
+        const msg = handleGoogleApiError(error, "syncRosterAction");
         return { students: [], error: msg };
     }
 }
@@ -58,8 +88,7 @@ export async function postHomeworkAction(
         const result = await postHomework(token, courseId, homework);
         return { result, error: null };
     } catch (error: unknown) {
-        const msg = error instanceof Error ? error.message : "Unknown error";
-        console.error("Homework posting failed:", error);
+        const msg = handleGoogleApiError(error, "postHomeworkAction");
         return { result: null, error: msg };
     }
 }
@@ -71,8 +100,7 @@ export async function getAssignmentsAction(courseId: string) {
         const assignments = await getAssignments(token, courseId);
         return { assignments, error: null };
     } catch (error: unknown) {
-        const msg = error instanceof Error ? error.message : "Unknown error";
-        console.error("Failed to fetch assignments:", error);
+        const msg = handleGoogleApiError(error, "getAssignmentsAction");
         return { assignments: [], error: msg };
     }
 }
@@ -87,8 +115,7 @@ export async function postNoteAction(
         const result = await postNote(token, courseId, note);
         return { result, error: null };
     } catch (error: unknown) {
-        const msg = error instanceof Error ? error.message : "Unknown error";
-        console.error("Note posting failed:", error);
+        const msg = handleGoogleApiError(error, "postNoteAction");
         return { result: null, error: msg };
     }
 }
@@ -100,8 +127,7 @@ export async function getAnnouncementsAction(courseId: string) {
         const announcements = await getCourseAnnouncements(token, courseId);
         return { announcements, error: null };
     } catch (error: unknown) {
-        const msg = error instanceof Error ? error.message : "Unknown error";
-        console.error("Failed to fetch announcements:", error);
+        const msg = handleGoogleApiError(error, "getAnnouncementsAction");
         return { announcements: [], error: msg };
     }
 }
