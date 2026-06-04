@@ -30,6 +30,7 @@ export default function StudentLoginPage() {
                     <SignIn
                         routing="hash"
                         forceRedirectUrl="/student/dashboard"
+                        fallbackRedirectUrl="/student/dashboard"
                         appearance={{
                             variables: {
                                 colorPrimary: "#6366f1",

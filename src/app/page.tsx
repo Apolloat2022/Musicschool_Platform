@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, Music, Sparkles, Award } from "lucide-react";
 import { SignInButton, UserButton, SignedIn, SignedOut } from "@clerk/nextjs";
+import SignInDropdown from "@/components/SignInDropdown";
 
 const programs = [
   {
@@ -46,32 +47,10 @@ export default function HomePage() {
             <Link href="/admin" className="text-sm font-medium text-slate-400 hover:text-white transition">Admin</Link>
             <div className="h-4 w-px bg-slate-800 mx-2" />
             <SignedOut>
-              <div className="relative group">
-                <button className="text-sm font-bold bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-xl transition shadow-lg shadow-indigo-600/20 flex items-center gap-2">
-                  Sign In
-                  <svg className="w-4 h-4 transition-transform group-hover:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </button>
-
-                {/* Dropdown Menu */}
-                <div className="absolute right-0 top-full mt-2 w-48 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 overflow-hidden">
-                  <Link href="/student/login" className="flex items-center gap-3 px-5 py-4 hover:bg-indigo-500/10 text-slate-300 hover:text-white transition-colors border-b border-slate-800">
-                    <div className="w-2 h-2 rounded-full bg-indigo-500"></div>
-                    <span className="text-sm font-bold">Student Portal</span>
-                  </Link>
-                  <Link href="/teacher/login" className="flex items-center gap-3 px-5 py-4 hover:bg-amber-500/10 text-slate-300 hover:text-white transition-colors border-b border-slate-800">
-                    <div className="w-2 h-2 rounded-full bg-amber-500"></div>
-                    <span className="text-sm font-bold">Teacher Portal</span>
-                  </Link>
-                  <Link href="/parent/login" className="flex items-center gap-3 px-5 py-4 hover:bg-emerald-500/10 text-slate-300 hover:text-white transition-colors">
-                    <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
-                    <span className="text-sm font-bold">Parent Portal</span>
-                  </Link>
-                </div>
-              </div>
+              <SignInDropdown />
             </SignedOut>
             <SignedIn>
+              <Link href="/student/dashboard" className="text-sm font-medium text-indigo-400 hover:text-indigo-300 transition">Dashboard</Link>
               <UserButton
                 appearance={{
                   elements: {

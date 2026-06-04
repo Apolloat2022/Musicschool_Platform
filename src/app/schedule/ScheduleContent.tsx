@@ -26,8 +26,6 @@ const instruments = [
     { name: "Voice", icon: Mic2 },
 ];
 
-const instructors = ["Sarah Jenkins", "Michael Chen", "Elena Rodriguez", "David Strauss", "Aria Smith"];
-
 interface ScheduleContentProps {
     classes: any[];
     user: { id: string; name: string; email: string; } | null;
@@ -179,7 +177,7 @@ export default function ScheduleContent({ classes, user, globalRole, enrolledCla
                         {enrolledClasses.map((cls, idx) => {
                             const level = getLevelInfo(cls.title);
                             const Icon = getInstrumentIcon(cls.instrument);
-                            const instructor = instructors[idx % instructors.length];
+                            const instructor = cls.teacherName || "TBA";
 
                             return (
                                 <div
@@ -218,7 +216,7 @@ export default function ScheduleContent({ classes, user, globalRole, enrolledCla
                     filteredClasses.map((cls, idx) => {
                         const level = getLevelInfo(cls.title);
                         const Icon = getInstrumentIcon(cls.instrument);
-                        const instructor = instructors[idx % instructors.length];
+                        const instructor = cls.teacherName || "TBA";
                         const classRole = getActiveRole(cls.id);
                         const isEnrolled = enrolledClassIds.includes(cls.id);
 

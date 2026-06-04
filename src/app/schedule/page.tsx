@@ -6,6 +6,7 @@ import { ChevronLeft } from "lucide-react";
 import { currentUser } from "@clerk/nextjs/server";
 import { getAcademyRole } from "@/lib/auth-utils";
 import { SignInButton, UserButton, SignedIn, SignedOut } from "@clerk/nextjs";
+import SignInDropdown from "@/components/SignInDropdown";
 
 export const dynamic = "force-dynamic";
 
@@ -51,11 +52,7 @@ export default async function SchedulePage() {
                     </div>
                     <div className="flex items-center gap-4">
                         <SignedOut>
-                            <SignInButton mode="modal">
-                                <button className="text-sm font-bold bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2 rounded-xl transition shadow-lg shadow-indigo-600/20">
-                                    Sign In
-                                </button>
-                            </SignInButton>
+                            <SignInDropdown />
                         </SignedOut>
                         <SignedIn>
                             <UserButton

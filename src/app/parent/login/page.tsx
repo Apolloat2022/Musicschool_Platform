@@ -29,7 +29,8 @@ export default function ParentLoginPage() {
                 <div className="flex justify-center">
                     <SignIn
                         routing="hash"
-                        forceRedirectUrl="/"
+                        forceRedirectUrl="/parent/dashboard"
+                        fallbackRedirectUrl="/parent/dashboard"
                         appearance={{
                             variables: {
                                 colorPrimary: "#10b981",

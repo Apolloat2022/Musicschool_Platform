@@ -30,6 +30,7 @@ export default function TeacherLoginPage() {
                     <SignIn
                         routing="hash"
                         forceRedirectUrl="/faculty/dashboard"
+                        fallbackRedirectUrl="/faculty/dashboard"
                         appearance={{
                             variables: {
                                 colorPrimary: "#f59e0b",
