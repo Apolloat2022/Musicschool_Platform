@@ -126,8 +126,8 @@ export async function POST(req: NextRequest) {
                             await db.update(subscriptions)
                                 .set({ 
                                     creditBalance: (sub.creditBalance || 0) + plan.creditDeposit,
-                                    currentPeriodStart: new Date(invoice.period_start * 1000).toISOString(),
-                                    currentPeriodEnd: new Date(invoice.period_end * 1000).toISOString()
+                                    currentPeriodStart: new Date(invoice.period_start * 1000),
+                                    currentPeriodEnd: new Date(invoice.period_end * 1000)
                                 })
                                 .where(eq(subscriptions.id, sub.id));
 
