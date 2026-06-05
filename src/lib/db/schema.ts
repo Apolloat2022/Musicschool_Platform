@@ -106,17 +106,43 @@ export const exitRequests = pgTable("exit_requests", {
   note: text("note"),
 });
 
+// ─── Attendance & Learning Hours ──────────────────────────────────
+export const attendance = pgTable("attendance", {
+  id: serial("id").primaryKey().notNull(),
+  enrollmentId: integer("enrollment_id").references(() => enrollments.id).notNull(),
+  classId: integer("class_id").references(() => musicClasses.id).notNull(),
+  date: timestamp("date").notNull(),
+  status: text("status").default("PRESENT").notNull(), // PRESENT, ABSENT, EXCUSED
+  durationMinutes: integer("duration_minutes").default(60), // Standard 60 mins per session
+  teacherNotes: text("teacher_notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // ─── Relations ────────────────────────────────────────────────────
 export const musicClassRelations = relations(musicClasses, ({ many }) => ({
   enrollments: many(enrollments),
+  attendance: many(attendance),
 }));
 
-export const enrollmentRelations = relations(enrollments, ({ one }) => ({
+export const enrollmentRelations = relations(enrollments, ({ one, many }) => ({
   musicClass: one(musicClasses, {
     fields: [enrollments.classId],
     references: [musicClasses.id],
   }),
+  attendance: many(attendance),
 }));
+
+export const attendanceRelations = relations(attendance, ({ one }) => ({
+  enrollment: one(enrollments, {
+    fields: [attendance.enrollmentId],
+    references: [enrollments.id],
+  }),
+  musicClass: one(musicClasses, {
+    fields: [attendance.classId],
+    references: [musicClasses.id],
+  }),
+}));
+// Cleaned up duplicates
 
 export const userRelations = relations(users, ({ many }) => ({
   subscriptions: many(subscriptions),
