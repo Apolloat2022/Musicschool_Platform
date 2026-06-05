@@ -27,18 +27,18 @@ export default function UpcomingInvoiceEmail({
   return (
     <Html>
       <Head />
-      <Preview>Your upcoming monthly investment for Apollo Academy</Preview>
+      <Preview>upcoming monthly investment for Apollo Academy</Preview>
       <Body style={main}>
         <Container style={container}>
           <Text style={logo}>Apollo Performing Arts & Academy</Text>
           <Hr style={hr} />
           
-          <Text style={paragraph}>Hello {parentName},</Text>
+          <Text style={paragraph}>hi {parentName}</Text>
           <Text style={paragraph}>
-            This is a friendly reminder that your upcoming monthly investment of <strong>${amountDue}</strong> will automatically process on <strong>{renewalDate}</strong>.
+            just a quick note that your upcoming monthly investment of ${amountDue} will automatically process on {renewalDate}
           </Text>
           <Text style={paragraph}>
-            This investment secures your child's service credits for the upcoming cycle, ensuring they maintain uninterrupted access to their masterclasses and instructors.
+            this investment secures your childs service credits for the upcoming cycle ensuring they maintain uninterrupted access to their masterclasses and instructors
           </Text>
           
           <Section style={btnContainer}>
@@ -48,13 +48,14 @@ export default function UpcomingInvoiceEmail({
           </Section>
           
           <Text style={paragraph}>
-            If you need to make any changes to your enrollment, or if you wish to exit your recurring subscription, you can do so directly from your Parent Dashboard at any time before the renewal date.
+            if you need to make any changes to your enrollment or if you wish to exit your recurring subscription you can do so directly from your Parent Dashboard at any time before the renewal date
           </Text>
           
           <Hr style={hr} />
           <Text style={footer}>
-            Apollo Performing Arts & Academy<br />
-            Nurturing the artists of tomorrow.
+            Apollo Performing Arts & Academy
+            <br />
+            nurturing the artists of tomorrow
           </Text>
         </Container>
       </Body>
@@ -63,7 +64,7 @@ export default function UpcomingInvoiceEmail({
 }
 
 const main = {
-  backgroundColor: "#020617", // slate-950
+  backgroundColor: "#020617",
   fontFamily:
     '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif',
 };
@@ -77,7 +78,7 @@ const container = {
 const logo = {
   fontSize: "24px",
   fontWeight: "bold",
-  color: "#34d399", // emerald-400
+  color: "#34d399",
   textAlign: "center" as const,
   marginBottom: "30px",
 };
@@ -85,7 +86,7 @@ const logo = {
 const paragraph = {
   fontSize: "16px",
   lineHeight: "26px",
-  color: "#cbd5e1", // slate-300
+  color: "#cbd5e1",
 };
 
 const btnContainer = {
@@ -95,7 +96,7 @@ const btnContainer = {
 };
 
 const button = {
-  backgroundColor: "#10b981", // emerald-500
+  backgroundColor: "#10b981",
   borderRadius: "8px",
   color: "#ffffff",
   fontSize: "16px",
@@ -107,12 +108,12 @@ const button = {
 };
 
 const hr = {
-  borderColor: "#1e293b", // slate-800
+  borderColor: "#1e293b",
   margin: "20px 0",
 };
 
 const footer = {
-  color: "#64748b", // slate-500
+  color: "#64748b",
   fontSize: "12px",
   textAlign: "center" as const,
 };
