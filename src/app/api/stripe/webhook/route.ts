@@ -13,6 +13,8 @@ import {
 } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import Stripe from "stripe";
+import { resend } from "@/lib/resend";
+import UpcomingInvoiceEmail from "@/emails/UpcomingInvoiceEmail";
 
 export async function POST(req: NextRequest) {
     const payload = await req.text();
@@ -149,6 +151,36 @@ export async function POST(req: NextRequest) {
                 await db.update(subscriptions)
                     .set({ status: "CANCELED" })
                     .where(eq(subscriptions.stripeSubscriptionId, subscription.id));
+                break;
+            }
+
+            case "invoice.upcoming": {
+                const invoice = event.data.object as any;
+                const customerId = invoice.customer as string;
+                const customerEmail = invoice.customer_email;
+                const customerName = invoice.customer_name || "Parent";
+                const amountDue = (invoice.amount_due / 100).toFixed(2);
+                
+                // Format the renewal date beautifully
+                const renewalDate = new Date(invoice.period_end * 1000).toLocaleDateString('en-US', {
+                    month: 'long',
+                    day: 'numeric',
+                    year: 'numeric'
+                });
+
+                if (customerEmail) {
+                    await resend.emails.send({
+                        from: 'Apollo Academy <billing@apolloperformingacademy.com>',
+                        to: [customerEmail],
+                        subject: 'Your upcoming monthly investment for Apollo Academy',
+                        react: UpcomingInvoiceEmail({
+                            parentName: customerName,
+                            amountDue,
+                            renewalDate,
+                            dashboardUrl: `${process.env.NEXT_PUBLIC_APP_URL || "https://musicschool-platform.vercel.app"}/parent/dashboard`
+                        }) as React.ReactElement
+                    });
+                }
                 break;
             }
         }
