@@ -3,6 +3,7 @@ import { enrollments, musicClasses } from "@/lib/db/schema";
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { eq, inArray } from "drizzle-orm";
+import Image from "next/image";
 import Link from "next/link";
 import { ChevronLeft, GraduationCap, Video, BookOpen, Music, Calendar } from "lucide-react";
 
@@ -40,8 +41,11 @@ export default async function StudentDashboardPage() {
                         <ChevronLeft size={20} className="transition-transform group-hover:-translate-x-1" />
                         <span className="text-sm font-medium">Back to Academy</span>
                     </Link>
-                    <div className="font-bold text-xl tracking-tight hidden sm:block">
-                        Apollo <span className="text-indigo-500">Academy</span> Student
+                    <div className="flex items-center gap-3">
+                        <Image src="/logo.png" alt="Apollo Academy" width={32} height={32} />
+                        <div className="font-bold text-xl tracking-tight hidden sm:block">
+                            Apollo <span className="text-indigo-500">Academy</span> Student
+                        </div>
                     </div>
                     <div className="flex items-center gap-4">
                         <Link

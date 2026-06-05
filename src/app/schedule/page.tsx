@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { db } from "@/lib/db";
 import { musicClasses } from "@/lib/db/schema";
 import ScheduleContent from "./ScheduleContent";
@@ -47,8 +48,11 @@ export default async function SchedulePage() {
                         <ChevronLeft size={20} className="transition-transform group-hover:-translate-x-1" />
                         <span className="text-sm font-medium">Back to Programs</span>
                     </Link>
-                    <div className="font-bold text-xl tracking-tight">
-                        Apollo <span className="text-indigo-500">Academy</span>
+                    <div className="flex items-center gap-3">
+                        <Image src="/logo.png" alt="Apollo Academy" width={32} height={32} />
+                        <div className="font-bold text-xl tracking-tight hidden sm:block">
+                            Apollo <span className="text-indigo-500">Academy</span>
+                        </div>
                     </div>
                     <div className="flex items-center gap-4">
                         <SignedOut>

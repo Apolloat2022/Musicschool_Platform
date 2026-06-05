@@ -34,14 +34,12 @@ export default function HomePage() {
       {/* Navigation */}
       <nav className="border-b border-slate-900 bg-slate-950/50 backdrop-blur-xl sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-2 group">
-            <div className="p-1.5 bg-indigo-500/10 rounded-lg border border-indigo-500/20">
-              <div className="w-6 h-6 bg-indigo-500 rounded-sm flex items-center justify-center font-bold text-[10px]">A</div>
-            </div>
+          <Link href="/" className="flex items-center gap-3 group">
+            <Image src="/logo.png" alt="Apollo Academy" width={36} height={36} />
             <div className="font-bold text-xl tracking-tight hidden sm:block">
               Apollo <span className="text-indigo-500">Academy</span>
             </div>
-          </div>
+          </Link>
           <div className="flex items-center gap-6">
             <Link href="/schedule" className="text-sm font-medium text-slate-400 hover:text-white transition">Schedule</Link>
             <Link href="/admin" className="text-sm font-medium text-slate-400 hover:text-white transition">Admin</Link>

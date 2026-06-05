@@ -1,3 +1,4 @@
+import Image from "next/image";
 import DashboardContent from "./DashboardContent";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
@@ -27,8 +28,11 @@ export default async function FacultyDashboardPage() {
                         <ChevronLeft size={20} className="transition-transform group-hover:-translate-x-1" />
                         <span className="text-sm font-medium">Back to Portal</span>
                     </Link>
-                    <div className="font-bold text-xl tracking-tight">
-                        Apollo <span className="text-indigo-500">Academy</span> Faculty
+                    <div className="flex items-center gap-3">
+                        <Image src="/logo.png" alt="Apollo Academy" width={32} height={32} />
+                        <div className="font-bold text-xl tracking-tight hidden sm:block">
+                            Apollo <span className="text-indigo-500">Academy</span> Faculty
+                        </div>
                     </div>
                     <div className="flex items-center gap-4">
                         <Link
