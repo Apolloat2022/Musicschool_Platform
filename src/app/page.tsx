@@ -72,13 +72,12 @@ export default function HomePage() {
 
         <div className="relative max-w-5xl mx-auto text-center">
           <div className="flex justify-center mb-8">
-            <div className="p-3 bg-slate-900 rounded-2xl border border-slate-800 shadow-2xl shadow-indigo-500/10">
+            <div className="shadow-2xl shadow-indigo-500/10 rounded-full">
               <Image
                 src="/logo.png"
                 alt="Apollo Music Academy"
                 width={80}
                 height={80}
-                className="rounded-xl"
               />
             </div>
           </div>
