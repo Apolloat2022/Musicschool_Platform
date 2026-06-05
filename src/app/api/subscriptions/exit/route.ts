@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
 
         // 3. Mark the subscription internally as having requested an exit
         await db.update(subscriptions)
-            .set({ exitRequestedAt: new Date().toISOString() })
+            .set({ exitRequestedAt: new Date() })
             .where(eq(subscriptions.id, subscription.id));
 
         return NextResponse.json({ success: true, message: "Exit workflow initiated. Access will continue until cycle ends." });
