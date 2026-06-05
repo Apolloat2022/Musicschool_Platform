@@ -1,6 +1,9 @@
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import { db } from "@/lib/db";
+import { users, subscriptions, subscriptionPlans } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
 import {
     ChevronLeft,
     Users,
@@ -9,8 +12,11 @@ import {
     TrendingUp,
     Bell,
     Settings,
-    Music
+    Music,
+    Wallet
 } from "lucide-react";
+import CheckoutButton from "@/components/CheckoutButton";
+import ExitButton from "@/components/ExitButton";
 
 export const dynamic = "force-dynamic";
 
@@ -21,6 +27,29 @@ export default async function ParentDashboardPage() {
     }
 
     const name = user.firstName || "Parent";
+
+    // 1. Fetch DB User
+    const dbUser = await db.query.users.findFirst({
+        where: eq(users.clerkId, user.id),
+        with: {
+            subscriptions: true,
+        }
+    });
+
+    let activeSubscription = null;
+    let planName = "No Active Plan";
+    let creditBalance = 0;
+
+    if (dbUser && dbUser.subscriptions.length > 0) {
+        activeSubscription = dbUser.subscriptions.find(s => s.status === 'ACTIVE' && !s.exitRequestedAt);
+        if (activeSubscription) {
+            creditBalance = activeSubscription.creditBalance || 0;
+            const plan = await db.query.subscriptionPlans.findFirst({
+                where: eq(subscriptionPlans.id, activeSubscription.planId)
+            });
+            if (plan) planName = plan.name;
+        }
+    }
 
     return (
         <main className="min-h-screen bg-slate-950 text-white selection:bg-emerald-500/30">
@@ -40,7 +69,6 @@ export default async function ParentDashboardPage() {
                     <div className="flex items-center gap-4">
                         <button className="relative p-2 text-slate-400 hover:text-white transition">
                             <Bell size={20} />
-                            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-emerald-500 rounded-full border-2 border-slate-950"></span>
                         </button>
                         <div className="h-8 w-px bg-slate-800 mx-2" />
                         <button className="p-2 text-slate-400 hover:text-white transition">
@@ -73,11 +101,11 @@ export default async function ParentDashboardPage() {
                             <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-800 p-6 rounded-3xl group hover:border-emerald-500/30 transition-all">
                                 <div className="flex items-center gap-4 mb-4">
                                     <div className="p-3 bg-emerald-500/10 rounded-2xl text-emerald-400">
-                                        <TrendingUp size={24} />
+                                        <Wallet size={24} />
                                     </div>
-                                    <h3 className="font-bold text-slate-300">Learning Hours</h3>
+                                    <h3 className="font-bold text-slate-300">Service Credits</h3>
                                 </div>
-                                <p className="text-3xl font-bold text-white">12.5 <span className="text-sm font-normal text-slate-500">this month</span></p>
+                                <p className="text-3xl font-bold text-white">{creditBalance} <span className="text-sm font-normal text-slate-500">available</span></p>
                             </div>
                             <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-800 p-6 rounded-3xl group hover:border-emerald-500/30 transition-all">
                                 <div className="flex items-center gap-4 mb-4">
@@ -110,41 +138,43 @@ export default async function ParentDashboardPage() {
 
                     {/* Right Column: Billing & Support */}
                     <div className="space-y-6">
-                        <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-800 p-8 rounded-3xl">
-                            <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
+                        <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-800 p-8 rounded-3xl flex flex-col gap-6">
+                            <h3 className="text-lg font-bold text-white flex items-center gap-2">
                                 <CreditCard size={20} className="text-emerald-400" />
                                 Family Billing
                             </h3>
+                            
                             <div className="space-y-4">
                                 <div className="p-4 bg-slate-950/50 rounded-2xl border border-slate-800">
-                                    <p className="text-xs text-slate-500 uppercase tracking-widest font-bold mb-1">Next Payment</p>
-                                    <p className="text-white font-bold">$0.00</p>
+                                    <p className="text-xs text-slate-500 uppercase tracking-widest font-bold mb-1">Current Plan</p>
+                                    <p className="text-white font-bold">{planName}</p>
                                 </div>
-                                <button className="w-full py-3 px-4 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl transition text-sm">
-                                    View Invoices
-                                </button>
+                                
+                                {!activeSubscription ? (
+                                    <CheckoutButton 
+                                        mode="subscription" 
+                                        priceId={process.env.NEXT_PUBLIC_STRIPE_PREMIUM_PLAN_PRICE_ID || ""} // You will need to create this in Stripe and add to .env
+                                        label="Subscribe to Premium" 
+                                        icon={true}
+                                    />
+                                ) : (
+                                    <>
+                                        <CheckoutButton 
+                                            mode="payment" 
+                                            priceCents={5000} // $50.00 hardcoded for extra credits for demo, better to use priceId
+                                            name="5 Extra Service Credits"
+                                            label="Buy Extra Credits" 
+                                            className="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl transition flex justify-center items-center gap-2"
+                                            icon={true}
+                                        />
+                                        <ExitButton subscriptionId={activeSubscription.id} />
+                                    </>
+                                )}
                             </div>
-                        </div>
-
-                        <div className="bg-gradient-to-br from-emerald-900/40 to-slate-900/40 backdrop-blur-xl border border-emerald-500/20 p-8 rounded-3xl">
-                            <h3 className="text-lg font-bold text-white mb-2">Concierge Support</h3>
-                            <p className="text-sm text-emerald-200/70 mb-6 leading-relaxed">
-                                Need assistance with scheduling or billing? Our priority support team is ready to help.
-                            </p>
-                            <button className="text-xs font-bold uppercase tracking-widest text-emerald-400 hover:text-emerald-300 transition flex items-center gap-2 group">
-                                Open Ticket
-                                <TrendingUp size={14} className="group-hover:translate-x-1 transition-transform" />
-                            </button>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <footer className="py-12 text-center border-t border-slate-900 mt-12">
-                <p className="text-slate-500 text-sm">
-                    © 2025 Apollo Music Academy • <span className="text-slate-400">Family Excellence</span>
-                </p>
-            </footer>
         </main>
     );
 }
