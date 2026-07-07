@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe";
+import { resolveProduct } from "@/lib/pricing";
 import { currentUser } from "@clerk/nextjs/server";
 import { db } from "@/lib/db";
 import { users } from "@/lib/db/schema";
@@ -13,7 +14,9 @@ export async function POST(req: NextRequest) {
         }
 
         const body = await req.json();
-        const { mode, priceId, priceCents, name, metadata } = body;
+        // NOTE: never accept a raw price amount from the client. Ad-hoc prices
+        // are resolved server-side from the pricing catalog by `productKey`.
+        const { mode, priceId, productKey, metadata } = body;
         
         if (!mode) {
             return new NextResponse("Missing mode", { status: 400 });
@@ -64,16 +67,21 @@ export async function POST(req: NextRequest) {
                     quantity: 1,
                 }
             ];
-        } else if (priceCents && name) {
-            // Ad-hoc pricing (for individual masterclasses where price isn't a Stripe Price object yet)
+        } else if (productKey) {
+            // Ad-hoc pricing: resolve the amount + name SERVER-SIDE from the
+            // catalog. The client only sends a product key, never a price.
+            const product = resolveProduct(productKey);
+            if (!product) {
+                return new NextResponse("Unknown product", { status: 400 });
+            }
             line_items = [
                 {
                     price_data: {
                         currency: 'usd',
                         product_data: {
-                            name: name,
+                            name: product.name,
                         },
-                        unit_amount: priceCents,
+                        unit_amount: product.priceCents,
                     },
                     quantity: 1,
                 }

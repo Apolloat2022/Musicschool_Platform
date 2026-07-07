@@ -6,21 +6,19 @@ import { ArrowRight, Loader2 } from "lucide-react";
 interface CheckoutButtonProps {
     mode: "subscription" | "payment";
     priceId?: string; // For existing Stripe products
-    priceCents?: number; // For ad-hoc masterclass pricing
-    name?: string; // Product name for ad-hoc
+    productKey?: string; // Catalog key for ad-hoc pricing (price resolved server-side)
     metadata?: any;
     label?: string;
     className?: string;
     icon?: boolean;
 }
 
-export default function CheckoutButton({ 
-    mode, 
-    priceId, 
-    priceCents, 
-    name, 
-    metadata, 
-    label = "Checkout", 
+export default function CheckoutButton({
+    mode,
+    priceId,
+    productKey,
+    metadata,
+    label = "Checkout",
     className,
     icon = false
 }: CheckoutButtonProps) {
@@ -35,8 +33,7 @@ export default function CheckoutButton({
                 body: JSON.stringify({
                     mode,
                     priceId,
-                    priceCents,
-                    name,
+                    productKey,
                     metadata
                 }),
             });

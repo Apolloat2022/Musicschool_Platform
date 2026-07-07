@@ -221,11 +221,10 @@ export default async function ParentDashboardPage() {
                                     />
                                 ) : (
                                     <>
-                                        <CheckoutButton 
-                                            mode="payment" 
-                                            priceCents={5000} // $50.00 hardcoded for extra credits for demo, better to use priceId
-                                            name="5 Extra Service Credits"
-                                            label="Buy Extra Credits" 
+                                        <CheckoutButton
+                                            mode="payment"
+                                            productKey="extra_credits_5"
+                                            label="Buy Extra Credits"
                                             className="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl transition flex justify-center items-center gap-2"
                                             icon={true}
                                         />

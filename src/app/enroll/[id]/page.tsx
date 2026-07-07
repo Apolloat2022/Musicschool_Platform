@@ -4,6 +4,7 @@ import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import CheckoutButton from "@/components/CheckoutButton";
 import { currentUser } from "@clerk/nextjs/server";
+import { PRODUCTS } from "@/lib/pricing";
 
 export default async function EnrollPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -16,9 +17,10 @@ export default async function EnrollPage({ params }: { params: Promise<{ id: str
   // If the ID doesn't exist in the DB, Next.js shows the 404/notFound page
   if (!musicClass) notFound();
 
-  // For demonstration, assume masterclasses cost $150.00 (15000 cents)
-  // In a real app, this would be a column on the musicClasses table.
-  const classPriceCents = 15000; 
+  // Price is sourced from the server-side catalog (single source of truth,
+  // and the same value the checkout API charges — the client cannot change it).
+  // Future: make this a per-class column on musicClasses instead of a flat rate.
+  const classPriceCents = PRODUCTS.class_enrollment.priceCents;
 
   return (
     <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4">
@@ -46,10 +48,9 @@ export default async function EnrollPage({ params }: { params: Promise<{ id: str
           </div>
           
           {user ? (
-             <CheckoutButton 
+             <CheckoutButton
                 mode="payment"
-                priceCents={classPriceCents}
-                name={`Enrollment: ${musicClass.title}`}
+                productKey="class_enrollment"
                 metadata={{ classId: musicClass.id.toString() }}
                 label="Pay & Enroll Now"
                 icon={true}

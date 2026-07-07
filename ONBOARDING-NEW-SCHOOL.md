@@ -145,6 +145,26 @@ These are "turn it on for real" items, independent of branding:
 4. **Legal pages.** `/privacy` and `/terms` exist and auto-fill the school's
    name, but should be reviewed by counsel before launch.
 
+### Ad-hoc pricing is server-authoritative (do not reintroduce client prices)
+
+The checkout API (`/api/stripe/checkout`) **never accepts a price amount from the
+browser.** Ad-hoc prices (class enrollment, extra credits) are resolved
+server-side from `src/lib/pricing.ts` by a `productKey`; recurring plans use
+Stripe Price IDs. This closed a tampering hole where a user could edit the
+request and pay an arbitrary amount (e.g. a $150 lesson for $1).
+
+**When configuring a school:** set that school's real prices in
+`src/lib/pricing.ts` (or wire each product to a Stripe Price ID). **Never** pass
+a `priceCents`/amount from a component to the checkout API — always a
+`productKey` or `priceId`. Treat any code that sends a client-supplied price as
+a security regression.
+
+_Related known gap:_ the class price is currently a flat catalog value, and the
+"extra credits" purchase does not yet attach a `serviceId`, so it charges
+correctly but doesn't auto-grant credits. Wire these to real `services` /
+`subscription_plans` rows (both have `price_cents` + `stripe_price_id` columns)
+before selling those specific flows.
+
 ---
 
 ## Quick reference: is this ready to sell?
@@ -152,6 +172,8 @@ These are "turn it on for real" items, independent of branding:
 - ✅ **Core product** — auth, roles, scheduling, Stripe subscriptions +
   one-time payments, webhooks, invoicing emails, live classrooms, admin panel.
 - ✅ **White-label** — fully config-driven; a new school needs zero code changes.
+- ✅ **Payment integrity** — checkout prices are server-authoritative (no client
+  price tampering).
 - ⚠️ **Go-live gaps** — live Stripe keys, video credentials, parental-consent
   flow, and legal review (list above).
 
