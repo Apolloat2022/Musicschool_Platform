@@ -7,7 +7,7 @@ import { musicClasses, enrollments } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { setAdminSession, logoutAdmin } from '@/lib/auth-admin';
+import { setAdminSession, logoutAdmin, requireAdmin } from '@/lib/auth-admin';
 
 export async function logoutAction() {
   await logoutAdmin();
@@ -15,6 +15,7 @@ export async function logoutAction() {
 }
 
 export async function createClass(formData: FormData) {
+  await requireAdmin();
   const title = formData.get('title') as string;
   const teacherName = formData.get('teacherName') as string;
   const instrument = formData.get('instrument') as string;
@@ -30,6 +31,7 @@ export async function createClass(formData: FormData) {
 }
 
 export async function deleteClass(formData: FormData) {
+  await requireAdmin();
   const classId = parseInt(formData.get('classId') as string);
 
   // Delete enrollments first (foreign key constraint)
@@ -41,6 +43,7 @@ export async function deleteClass(formData: FormData) {
 }
 
 export async function enrollStudent(formData: FormData) {
+  await requireAdmin();
   const classId = parseInt(formData.get('classId') as string);
   const studentName = formData.get('studentName') as string;
   const studentEmail = formData.get('studentEmail') as string;
@@ -86,8 +89,13 @@ export async function loginAdmin(formData: FormData) {
   const user = formData.get('user') as string;
   const pass = formData.get('pass') as string;
 
-  const EXPECTED_USER = process.env.ADMIN_USER || "admin";
-  const EXPECTED_PASS = process.env.ADMIN_PASS || "apollo2025";
+  const EXPECTED_USER = process.env.ADMIN_USER;
+  const EXPECTED_PASS = process.env.ADMIN_PASS;
+
+  if (!EXPECTED_USER || !EXPECTED_PASS) {
+    console.error("ADMIN_USER / ADMIN_PASS are not configured; admin login is disabled.");
+    redirect('/admin/login?error=Admin login is not configured');
+  }
 
   if (user === EXPECTED_USER && pass === EXPECTED_PASS) {
     await setAdminSession(user);

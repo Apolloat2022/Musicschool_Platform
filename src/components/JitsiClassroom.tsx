@@ -36,9 +36,11 @@ export default function JitsiClassroom({ roomName, userName, userId, userEmail, 
 
         async function fetchToken() {
             try {
-                console.log(`[Jitsi] Requesting token for room: ${roomName}, as moderator: ${isModerator}`);
+                console.log(`[Jitsi] Requesting token for room: ${roomName}`);
                 const startTime = Date.now();
-                const result = await getJitsiToken(roomName, userName, userId, userEmail, isModerator);
+                // Moderator status and identity are decided server-side from the
+                // authenticated session; we only send a display-name preference.
+                const result = await getJitsiToken(roomName, userName);
                 const duration = Date.now() - startTime;
 
                 console.log(`[Jitsi] Server responded in ${duration}ms`);

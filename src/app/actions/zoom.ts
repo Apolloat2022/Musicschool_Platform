@@ -2,14 +2,31 @@
 "use server";
 
 import crypto from "crypto";
+import { currentUser } from "@clerk/nextjs/server";
+import { getAcademyRole } from "@/lib/auth-utils";
+import { db } from "@/lib/db";
+import { musicClasses } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
 
-export async function getZoomSignature(meetingNumber: string, role: number) {
+// SECURITY: this is a public server action. The Zoom `role` (0 = attendee,
+// 1 = host) must be decided server-side from the authenticated session — never
+// accepted from the client, or any attendee could request host and control the
+// meeting. The `requestedRole` param is ignored for privilege purposes.
+export async function getZoomSignature(meetingNumber: string, _requestedRole?: number) {
     const sdkKey = process.env.ZOOM_SDK_KEY;
     const sdkSecret = process.env.ZOOM_SDK_SECRET;
 
     if (!sdkKey || !sdkSecret) {
         return { signature: null, error: "Zoom SDK Key or Secret not configured." };
     }
+
+    // Resolve host privilege from the server session.
+    const user = await currentUser();
+    const musicClass = await db.query.musicClasses.findFirst({
+        where: eq(musicClasses.zoomMeetingNumber, meetingNumber),
+    });
+    const academyRole = await getAcademyRole(user, musicClass?.id);
+    const role = academyRole === "MODERATOR" ? 1 : 0;
 
     const iat = Math.round(new Date().getTime() / 1000) - 30;
     const exp = iat + 60 * 60 * 2; // 2 hours

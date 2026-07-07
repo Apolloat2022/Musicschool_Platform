@@ -136,6 +136,10 @@ export async function getAnnouncementsAction(courseId: string) {
  * Links an existing music class in the DB to a Google Classroom course ID.
  */
 export async function linkCourseIdAction(classId: number, courseId: string) {
+    const { userId } = await auth();
+    if (!userId) {
+        return { error: "Unauthorized: you must be signed in to link a course." };
+    }
     courseId = getNumericCourseId(courseId);
     try {
         await db

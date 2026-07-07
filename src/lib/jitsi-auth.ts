@@ -17,8 +17,6 @@ export async function signJitsiToken(options: JitsiTokenOptions) {
         throw new Error("Jitsi Configuration Error: Application ID and Private Key are required.");
     }
 
-    console.log(`[Jitsi Auth] STEP 1: Variables loaded. AppId=${appId ? 'OK' : 'MISSING'}`);
-
     // Aggressive cleanup: remove all whitespace, quotes, then re-format as proper PEM
     let cleanKey = rawKey
         .replace(/-----BEGIN PRIVATE KEY-----/g, '')
@@ -57,8 +55,6 @@ export async function signJitsiToken(options: JitsiTokenOptions) {
                 },
             },
         };
-
-        console.log(`[Jitsi Auth] Signing Payload:`, JSON.stringify(payload, null, 2));
 
         const token = await new jose.SignJWT(payload)
             .setProtectedHeader({ alg: "RS256", kid: kid, typ: "JWT" })

@@ -1,7 +1,13 @@
 import { cookies } from "next/headers";
 import { SignJWT, jwtVerify } from "jose";
 
-const SECRET = new TextEncoder().encode(process.env.JWT_SECRET || "apollo-music-academy-secret-2025");
+if (!process.env.JWT_SECRET) {
+    throw new Error(
+        "JWT_SECRET is not set. Refusing to start with an insecure default admin-session signing key."
+    );
+}
+
+const SECRET = new TextEncoder().encode(process.env.JWT_SECRET);
 const COOKIE_NAME = "admin_session";
 
 export async function encrypt(payload: any) {
@@ -44,4 +50,23 @@ export async function logoutAdmin() {
 
 export function isAdminAuthenticated(session: any) {
     return !!session && new Date(session.expires) > new Date();
+}
+
+/**
+ * Guard for admin-only server actions. Server actions are public POST
+ * endpoints, so every mutating admin action must call this itself — being
+ * rendered only on an admin page does NOT protect it. Throws if the caller
+ * does not hold a valid admin session.
+ */
+export async function requireAdmin() {
+    let session: any = null;
+    try {
+        session = await getAdminSession();
+    } catch {
+        session = null;
+    }
+    if (!isAdminAuthenticated(session)) {
+        throw new Error("Unauthorized: admin session required.");
+    }
+    return session;
 }
