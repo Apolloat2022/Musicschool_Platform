@@ -13,7 +13,7 @@ export default async function AdminPage() {
     <div className="min-h-screen bg-slate-50 p-6 md:p-12 text-black">
       <div className="max-w-6xl mx-auto">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold">Teacher Dashboard</h1>
+          <h1 className="text-3xl font-bold">Admin Dashboard</h1>
           <div className="flex gap-4">
             <Link href="/" className="bg-white border text-slate-700 hover:text-indigo-600 px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 transition-colors">
               <Home size={18} /> Home Page
