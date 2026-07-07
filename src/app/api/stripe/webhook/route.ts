@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe";
+import { school } from "@/config/school";
 import { db } from "@/lib/db";
 import { 
     users, 
@@ -170,9 +171,9 @@ export async function POST(req: NextRequest) {
 
                 if (customerEmail) {
                     await resend.emails.send({
-                        from: 'Apollo Academy <billing@apolloperformingacademy.com>',
+                        from: school.billingFrom,
                         to: [customerEmail],
-                        subject: 'Your upcoming monthly investment for Apollo Academy',
+                        subject: `Your upcoming monthly investment for ${school.shortName}`,
                         react: UpcomingInvoiceEmail({
                             parentName: customerName,
                             amountDue,

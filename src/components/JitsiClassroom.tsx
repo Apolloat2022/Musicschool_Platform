@@ -3,6 +3,7 @@
 import { JitsiMeeting } from "@jitsi/react-sdk";
 import { useEffect, useState } from "react";
 import { getJitsiToken } from "@/app/actions/jitsi";
+import { school } from "@/config/school";
 
 interface JitsiClassroomProps {
     roomName: string;
@@ -133,7 +134,7 @@ export default function JitsiClassroom({ roomName, userName, userId, userEmail, 
                     if (!isModerator) {
                         const trialLimit = 30 * 60 * 1000;
                         setTimeout(() => {
-                            alert("Your 30-minute trial session has concluded. Please enroll to continue your journey with Apollo Music Academy!");
+                            alert(`Your 30-minute trial session has concluded. Please enroll to continue your journey with ${school.name}!`);
                             window.location.href = "/schedule";
                         }, trialLimit);
                     }

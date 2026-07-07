@@ -4,6 +4,8 @@ import { db } from "@/lib/db";
 import { musicClasses, enrollments, attendance } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { Users, CheckCircle, Clock } from "lucide-react";
+import { school } from "@/config/school";
+import { BrandName } from "@/components/BrandName";
 import Image from "next/image";
 import Link from "next/link";
 import MarkAttendanceButton from "./MarkAttendanceButton";
@@ -32,8 +34,8 @@ export default async function TeacherDashboardPage() {
             <nav className="border-b border-slate-800 bg-slate-950/50 backdrop-blur-xl sticky top-0 z-50">
                 <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
                     <Link href="/" className="flex items-center gap-3">
-                        <Image src="/logo.png" alt="Apollo Academy" width={40} height={40} />
-                        <span className="font-bold text-xl tracking-tight">Apollo <span className="text-emerald-500">Academy</span></span>
+                        <Image src={school.logoSrc} alt={school.shortName} width={40} height={40} />
+                        <BrandName short className="font-bold text-xl tracking-tight" accentClassName="text-emerald-500" />
                     </Link>
                     <div className="flex items-center gap-4">
                         <span className="text-slate-400 font-medium hidden md:block">Instructor Portal</span>

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { getZoomSignature } from "@/app/actions/zoom";
+import { school } from "@/config/school";
 
 interface ZoomClassroomProps {
     meetingNumber: string;
@@ -53,7 +54,7 @@ export default function ZoomClassroom({ meetingNumber, userName, password, role 
 
                     // Implement a 30-minute hard shutdown for trials
                     setTimeout(() => {
-                        alert("This trial session has reached its 30-minute limit. Thank you for visiting Apollo Music Academy!");
+                        alert(`This trial session has reached its 30-minute limit. Thank you for visiting ${school.name}!`);
                         // @ts-ignore
                         clientInstance.leaveMeeting();
                     }, 30 * 60 * 1000);

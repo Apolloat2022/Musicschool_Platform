@@ -9,6 +9,7 @@ import {
     linkCourseIdAction,
 } from "@/app/actions/google-classroom";
 import { createClass } from "@/lib/actions";
+import { school } from "@/config/school";
 import {
     Users,
     Send,
@@ -99,7 +100,7 @@ export default function FacultyDashboard({ classes }: FacultyDashboardProps) {
         const { error } = await postHomeworkAction(courseId, {
             title: hwTitle,
             description: hwDesc,
-            link: hwLink || "https://apollotunes.com/practice",
+            link: hwLink || `${school.url}/practice`,
         });
         if (error) flash("error", error);
         else {
@@ -262,7 +263,7 @@ export default function FacultyDashboard({ classes }: FacultyDashboardProps) {
                                         </div>
                                         <div>
                                             <label className="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Practice Link (Optional)</label>
-                                            <input type="url" value={hwLink} onChange={(e) => setHwLink(e.target.value)} placeholder="https://apollotunes.com/..." className="w-full bg-slate-950 border border-slate-800 rounded-xl px-5 py-4 text-white focus:border-indigo-500 outline-none transition" />
+                                            <input type="url" value={hwLink} onChange={(e) => setHwLink(e.target.value)} placeholder="https://example.com/..." className="w-full bg-slate-950 border border-slate-800 rounded-xl px-5 py-4 text-white focus:border-indigo-500 outline-none transition" />
                                         </div>
                                     </div>
                                     <div>

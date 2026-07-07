@@ -4,6 +4,8 @@ import { musicClasses } from "@/lib/db/schema";
 import ScheduleContent from "./ScheduleContent";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
+import { school, currentYear } from "@/config/school";
+import { BrandName } from "@/components/BrandName";
 import { currentUser } from "@clerk/nextjs/server";
 import { getAcademyRole } from "@/lib/auth-utils";
 import { SignInButton, UserButton, SignedIn, SignedOut } from "@clerk/nextjs";
@@ -49,9 +51,9 @@ export default async function SchedulePage() {
                         <span className="text-sm font-medium">Back to Programs</span>
                     </Link>
                     <div className="flex items-center gap-3">
-                        <Image src="/logo.png" alt="Apollo Academy" width={32} height={32} />
+                        <Image src={school.logoSrc} alt={school.shortName} width={32} height={32} />
                         <div className="font-bold text-xl tracking-tight hidden sm:block">
-                            Apollo <span className="text-indigo-500">Academy</span>
+                            <BrandName short />
                         </div>
                     </div>
                     <div className="flex items-center gap-4">
@@ -80,7 +82,7 @@ export default async function SchedulePage() {
 
             <footer className="py-12 text-center border-t border-slate-900 mt-12">
                 <p className="text-slate-500 text-sm">
-                    © 2025 Apollo Music Academy • <span className="text-slate-400">Excellence in Performance</span>
+                    © {currentYear} {school.name} • <span className="text-slate-400">{school.footerTagline}</span>
                 </p>
             </footer>
         </main>

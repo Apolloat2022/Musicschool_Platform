@@ -3,6 +3,8 @@ import Image from "next/image";
 import { ArrowRight, Music, Sparkles, Award } from "lucide-react";
 import { SignInButton, UserButton, SignedIn, SignedOut } from "@clerk/nextjs";
 import SignInDropdown from "@/components/SignInDropdown";
+import { school, currentYear } from "@/config/school";
+import { BrandName } from "@/components/BrandName";
 
 const programs = [
   {
@@ -35,10 +37,8 @@ export default function HomePage() {
       <nav className="border-b border-slate-900 bg-slate-950/50 backdrop-blur-xl sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3 group">
-            <Image src="/logo.png" alt="Apollo Academy" width={36} height={36} />
-            <div className="font-bold text-xl tracking-tight hidden sm:block">
-              Apollo <span className="text-indigo-500">Academy</span>
-            </div>
+            <Image src={school.logoSrc} alt={school.shortName} width={36} height={36} />
+            <BrandName short className="font-bold text-xl tracking-tight hidden sm:block" />
           </Link>
           <div className="flex items-center gap-6">
             <Link href="/schedule" className="text-sm font-medium text-slate-400 hover:text-white transition">Schedule</Link>
@@ -72,8 +72,8 @@ export default function HomePage() {
           <div className="flex justify-center mb-8">
             <div className="shadow-2xl shadow-indigo-500/10 rounded-full">
               <Image
-                src="/logo.png"
-                alt="Apollo Music Academy"
+                src={school.logoSrc}
+                alt={school.name}
                 width={80}
                 height={80}
               />
@@ -81,11 +81,10 @@ export default function HomePage() {
           </div>
 
           <h1 className="text-5xl md:text-7xl font-bold mb-6 tracking-tight bg-gradient-to-b from-white to-slate-400 bg-clip-text text-transparent">
-            Apollo <span className="text-indigo-500">Music</span> Academy
+            <BrandName />
           </h1>
           <p className="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
-            Elevate your musicality with our signature learning tiers.
-            Choose your path and begin your transformation today.
+            {school.tagline}
           </p>
         </div>
       </div>
@@ -142,7 +141,7 @@ export default function HomePage() {
 
       <footer className="py-12 text-center border-t border-slate-900">
         <p className="text-slate-500 text-sm mb-4">
-          © 2025 Apollo Music Academy • <span className="text-slate-400">Excellence in Performance</span>
+          © {currentYear} {school.name} • <span className="text-slate-400">{school.footerTagline}</span>
         </p>
         <div className="flex justify-center gap-8">
           <Link

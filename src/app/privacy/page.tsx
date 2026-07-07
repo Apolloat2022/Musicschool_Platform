@@ -1,18 +1,20 @@
-export const metadata = { title: 'Privacy Policy — Music School Platform' };
+import { school } from "@/config/school";
+
+export const metadata = { title: `Privacy Policy — ${school.name}` };
 
 // Generated legal page. Review with counsel before relying on it.
 export default function PrivacyPolicyPage() {
     return (
         <main className="mx-auto max-w-3xl px-6 py-16 leading-relaxed">
             <h1 className="text-3xl font-bold mb-2">Privacy Policy</h1>
-            <p className="text-sm opacity-60 mb-10">Music School Platform · Last updated: July 6, 2026</p>
+            <p className="text-sm opacity-60 mb-10">{school.name} · Last updated: July 6, 2026</p>
 
             <section className="space-y-4">
                 <h2 className="text-xl font-semibold pt-4">Who we are</h2>
                 <p>
-                    Music School Platform is operated by Apollo Technologies (&quot;we&quot;, &quot;us&quot;). For any
+                    {school.name} (&quot;we&quot;, &quot;us&quot;) operates this service. For any
                     privacy question or request, email{' '}
-                    <a className="underline" href="mailto:revanaglobal@gmail.com">revanaglobal@gmail.com</a>.
+                    <a className="underline" href={`mailto:${school.contactEmail}`}>{school.contactEmail}</a>.
                 </p>
 
                 <h2 className="text-xl font-semibold pt-4">Information we collect</h2>
@@ -45,7 +47,7 @@ export default function PrivacyPolicyPage() {
                 <p>
                     You can request a copy of your data, a correction, or deletion of your account and data
                     at any time by emailing{' '}
-                    <a className="underline" href="mailto:revanaglobal@gmail.com">revanaglobal@gmail.com</a>. We respond to verified
+                    <a className="underline" href={`mailto:${school.contactEmail}`}>{school.contactEmail}</a>. We respond to verified
                     requests within 30 days.
                 </p>
 

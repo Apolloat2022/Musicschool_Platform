@@ -5,6 +5,7 @@ import { Lock, User, Music, ArrowRight } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Suspense, useEffect, useRef, useState } from "react";
+import { school, currentYear } from "@/config/school";
 
 const REMEMBER_KEY = "admin_saved_user";
 
@@ -152,7 +153,7 @@ export default function AdminLoginPage() {
                 </div>
 
                 <p className="text-center mt-8 text-slate-600 text-xs tracking-widest uppercase font-bold">
-                    © 2025 Apollo Music Academy • Protected Resource
+                    © {currentYear} {school.name} • Protected Resource
                 </p>
             </div>
         </div>

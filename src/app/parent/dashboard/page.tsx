@@ -4,6 +4,8 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { db } from "@/lib/db";
 import { users, subscriptions, subscriptionPlans, enrollments, musicClasses, attendance } from "@/lib/db/schema";
+import { school } from "@/config/school";
+import { BrandName } from "@/components/BrandName";
 import { eq, inArray } from "drizzle-orm";
 import {
     ChevronLeft,
@@ -99,9 +101,9 @@ export default async function ParentDashboardPage() {
                         <span className="text-sm font-medium">Back to Academy</span>
                     </Link>
                     <div className="flex items-center gap-3">
-                        <Image src="/logo.png" alt="Apollo Academy" width={32} height={32} />
+                        <Image src={school.logoSrc} alt={school.shortName} width={32} height={32} />
                         <div className="font-bold text-xl tracking-tight hidden sm:block">
-                            Apollo <span className="text-emerald-500">Academy</span> Parent
+                            <BrandName short accentClassName="text-emerald-500" /> Parent
                         </div>
                     </div>
                     <div className="flex items-center gap-4">

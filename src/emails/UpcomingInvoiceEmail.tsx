@@ -10,6 +10,7 @@ import {
   Text,
 } from "@react-email/components";
 import * as React from "react";
+import { school } from "@/config/school";
 
 interface UpcomingInvoiceEmailProps {
   parentName: string;
@@ -27,10 +28,10 @@ export default function UpcomingInvoiceEmail({
   return (
     <Html>
       <Head />
-      <Preview>upcoming monthly investment for Apollo Academy</Preview>
+      <Preview>upcoming monthly investment for {school.shortName}</Preview>
       <Body style={main}>
         <Container style={container}>
-          <Text style={logo}>Apollo Performing Arts & Academy</Text>
+          <Text style={logo}>{school.name}</Text>
           <Hr style={hr} />
           
           <Text style={paragraph}>hi {parentName}</Text>
@@ -53,7 +54,7 @@ export default function UpcomingInvoiceEmail({
           
           <Hr style={hr} />
           <Text style={footer}>
-            Apollo Performing Arts & Academy
+            {school.name}
             <br />
             nurturing the artists of tomorrow
           </Text>

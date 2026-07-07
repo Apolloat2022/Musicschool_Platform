@@ -3,6 +3,7 @@
 import { Music, Mail, ArrowLeft, Phone, ShieldAlert } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+import { school, currentYear } from "@/config/school";
 
 export default function AdminForgotPasswordPage() {
     const [submitted, setSubmitted] = useState(false);
@@ -88,7 +89,7 @@ export default function AdminForgotPasswordPage() {
                 </div>
 
                 <p className="text-center mt-8 text-slate-600 text-xs tracking-widest uppercase font-bold">
-                    © 2025 Apollo Music Academy • Protected Resource
+                    © {currentYear} {school.name} • Protected Resource
                 </p>
             </div>
         </div>

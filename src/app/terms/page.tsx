@@ -1,16 +1,18 @@
-export const metadata = { title: 'Terms of Service — Music School Platform' };
+import { school } from "@/config/school";
+
+export const metadata = { title: `Terms of Service — ${school.name}` };
 
 // Generated legal page. Review with counsel before relying on it.
 export default function TermsOfServicePage() {
     return (
         <main className="mx-auto max-w-3xl px-6 py-16 leading-relaxed">
             <h1 className="text-3xl font-bold mb-2">Terms of Service</h1>
-            <p className="text-sm opacity-60 mb-10">Music School Platform · Last updated: July 6, 2026</p>
+            <p className="text-sm opacity-60 mb-10">{school.name} · Last updated: July 6, 2026</p>
 
             <section className="space-y-4">
                 <h2 className="text-xl font-semibold pt-4">Agreement</h2>
                 <p>
-                    By creating an account or using Music School Platform, you agree to these terms and to our{' '}
+                    By creating an account or using {school.name}, you agree to these terms and to our{' '}
                     <a className="underline" href="/privacy">Privacy Policy</a>. If you do not agree, do not
                     use the service.
                 </p>
